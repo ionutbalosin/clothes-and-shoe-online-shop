@@ -78,6 +78,9 @@ project(':httpclient-shop') {
     dependencies {
         compile('io.vertx:vertx-core:3.5.3')
         compile('io.vertx:vertx-web:3.5.3')
+        compile('io.vertx:vertx-service-discovery:3.5.3')
+        runtime('io.vertx:vertx-rx-java2:3.5.3')
+        runtime('io.reactivex.rxjava2:rxjava:2.2.2')
         compile('log4j:log4j:1.2.17')
         compile('org.apache.logging.log4j:log4j-api:2.7')
         compile('org.apache.logging.log4j:log4j-core:2.7')

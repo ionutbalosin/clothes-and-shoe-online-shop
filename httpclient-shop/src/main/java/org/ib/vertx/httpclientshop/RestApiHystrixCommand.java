@@ -6,7 +6,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
-import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
 
 import java.util.concurrent.CountDownLatch;
@@ -15,16 +14,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RestApiHystrixCommand extends HystrixCommand<String> {
 
-    protected Vertx vertx;
-    protected RoutingContext routingContext;
-    public final static Logger logger = Logger.getLogger(RestApiHystrixCommand.class);
-    public final int port;
-    public final String host;
-    public final String requestURI;
+    private final static Logger logger = Logger.getLogger(RestApiHystrixCommand.class);
 
-    public RestApiHystrixCommand(Vertx vertx, RoutingContext routingContext, int port, String host, String requestURI) {
+    private final Vertx vertx;
+    private final int port;
+    private final String host;
+    private final String requestURI;
+
+    public RestApiHystrixCommand(Vertx vertx, int port, String host, String requestURI) {
         super(HystrixCommandGroupKey.Factory.asKey("RestHystrixCommand"));
-        this.routingContext = routingContext;
         this.vertx = vertx;
         this.port = port;
         this.host = host;

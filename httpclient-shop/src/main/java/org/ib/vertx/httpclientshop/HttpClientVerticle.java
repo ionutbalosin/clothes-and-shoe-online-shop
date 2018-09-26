@@ -19,9 +19,13 @@ public class HttpClientVerticle extends AbstractVerticle {
     public void start(Future<Void> startFuture) {
         // Create a router object.
         Router router = Router.router(vertx);
+        RestApiServiceDiscovery serviceDiscovery = new RestApiServiceDiscovery(vertx);
         router.get("/").handler(this::home);
         router.get("/orderHat").handler(this::orderHat);
         router.get("/orderShoe").handler(this::orderShoe);
+        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/");
+        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/orderHat");
+        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/orderShoe");
 
         // Create the HTTP server and pass the "accept" method to the request handler.
         vertx
@@ -59,7 +63,7 @@ public class HttpClientVerticle extends AbstractVerticle {
 
     private void performRestCall(RoutingContext routingContext, String requestURI){
         vertx.runOnContext(v -> {
-            HystrixCommand<String> command = new RestApiHystrixCommand(vertx, routingContext, 8080, "localhost", requestURI);
+            HystrixCommand<String> command = new RestApiHystrixCommand(vertx, 8080, "localhost", requestURI);
             vertx.<String>executeBlocking(
                     future -> future.complete(command.execute()),
                     ar -> {
