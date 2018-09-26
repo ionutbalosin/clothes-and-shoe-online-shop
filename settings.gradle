@@ -1,3 +1,4 @@
 rootProject.name = 'clothes-and-shoe-online-shop'
 
 include 'hat-service-provider'
+include 'httpclient-shop'
