@@ -20,13 +20,18 @@ public class HttpClientVerticle extends AbstractVerticle {
         // Create a router object.
         Router router = Router.router(vertx);
         RestApiServiceDiscovery serviceDiscovery = new RestApiServiceDiscovery(vertx);
+
+        // Record endpoints.
         router.get("/").handler(this::home);
         router.get("/orderHat").handler(this::orderHat);
         router.get("/orderShoe").handler(this::orderShoe);
-        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/");
-        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/orderHat");
-        serviceDiscovery.publish("httpclient-shop", "localhost", config().getInteger("http.port", 8081), "/orderShoe");
 
+        serviceDiscovery.publish("httpclient-shop1", "localhost", config().getInteger("http.port", 8081), "/");
+        serviceDiscovery.publish("httpclient-shop2", "localhost", config().getInteger("http.port", 8081), "/orderHat");
+        serviceDiscovery.publish("httpclient-shop3", "localhost", config().getInteger("http.port", 8081), "/orderShoe");
+
+        serviceDiscovery.getService("orderHat");
+        serviceDiscovery.getService("orderShoe");
         // Create the HTTP server and pass the "accept" method to the request handler.
         vertx
             .createHttpServer()
