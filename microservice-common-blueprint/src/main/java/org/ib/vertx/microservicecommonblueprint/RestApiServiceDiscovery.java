@@ -1,11 +1,17 @@
 package org.ib.vertx.microservicecommonblueprint;
 
+import io.vertx.circuitbreaker.CircuitBreaker;
+import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.impl.ConcurrentHashSet;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
@@ -17,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RestApiServiceDiscovery {
@@ -25,7 +32,7 @@ public class RestApiServiceDiscovery {
     private final Set<Record> registeredRecords;
     private final AbstractVerticle verticle;
     private ServiceDiscovery discovery;
-    //private CircuitBreaker circuitBreaker;
+    private CircuitBreaker circuitBreaker;
 
     public RestApiServiceDiscovery(AbstractVerticle verticle) {
         this.verticle = verticle;
@@ -73,15 +80,15 @@ public class RestApiServiceDiscovery {
             ));
 
         // init circuit breaker instance
-        //JsonObject cbOptions = verticle.config().getJsonObject("circuit-breaker") != null ?
-        //verticle.config().getJsonObject("circuit-breaker") : new JsonObject();
-        //circuitBreaker = CircuitBreaker.create(cbOptions.getString("name", "circuit-breaker"), verticle.getVertx(),
-        //    new CircuitBreakerOptions()
-        //        .setMaxFailures(cbOptions.getInteger("max-failures", 5))
-        //        .setTimeout(cbOptions.getLong("timeout", 10000L))
-        //        .setFallbackOnFailure(true)
-        //        .setResetTimeout(cbOptions.getLong("reset-timeout", 30000L))
-        //);
+        JsonObject cbOptions = verticle.config().getJsonObject("circuit-breaker") != null ?
+        verticle.config().getJsonObject("circuit-breaker") : new JsonObject();
+        circuitBreaker = CircuitBreaker.create(cbOptions.getString("name", "circuit-breaker"), verticle.getVertx(),
+            new CircuitBreakerOptions()
+                .setMaxFailures(cbOptions.getInteger("max-failures", 5))
+                .setTimeout(cbOptions.getLong("timeout", 10000L))
+                .setFallbackOnFailure(true)
+                .setResetTimeout(cbOptions.getLong("reset-timeout", 30000L))
+        );
     }
 
     private void stop(Future<Void> future) throws Exception {
@@ -109,27 +116,99 @@ public class RestApiServiceDiscovery {
         }
     }
 
-    public Record publish(String name, String host, int port, String root){
-        // Record creation from a type
-        Record record = HttpEndpoint.createRecord(
-                name, // The service name
-                host, // The host
-                port, // the port
-                root // the root of the service
-        );
+    public Buffer dispatchRequests(RoutingContext context, String path) {
+        AtomicReference<Buffer> result = new AtomicReference<>();
+        // NB: Trick to wait for the asynchronous thread with the HTTP response until sending a Client response
+        CountDownLatch latch = new CountDownLatch(1);
+        // run with circuit breaker in order to deal with failure
+        circuitBreaker.execute(future -> {
+            getAllEndpoints().setHandler(ar -> {
+                if (ar.succeeded()) {
+                    List<Record> recordList = ar.result();
+                    // get relative path and retrieve prefix to dispatch client
+                    logger.info("Creating request to URI " + path);
 
-        discovery.publish(record, ar -> {
-            if (ar.succeeded()) {
-                // publication succeeded
-                Record publishedRecord = ar.result();
-                logger.info("Endpoint [" + name + "] " + publishedRecord.getLocation() + " publication succeeded");
-            } else {
-                // publication failed
-                logger.warn("Endpoint [" + name + "] publication failed. Please check if the back-end is up and running.");
+                    String prefix = (path.split("/"))[0];
+                    // generate new relative path
+                    String newPath = path.substring(prefix.length());
+                    // get one relevant HTTP client, may not exist
+                    Optional<Record> client = recordList.stream()
+                        .filter(record -> record.getMetadata().getString("api.name") != null)
+                        .filter(record -> record.getMetadata().getString("api.name").equals(prefix))
+                        .findAny(); // simple load balance
+                    if (client.isPresent()) {
+                        logger.info("Creating request to " + client.get().getLocation());
+                        result.set(doDispatch(context, newPath, discovery.getReference(client.get()).get(), future));
+                    } else {
+                        logger.info("Client not found");
+                        notFound(context);
+                        future.complete();
+                    }
+                } else {
+                    future.fail(ar.cause());
+                }
+                latch.countDown();
+            });
+        }).setHandler(ar -> {
+            if (ar.failed()) {
+                badGateway(ar.cause(), context);
+                latch.countDown();
             }
         });
 
-        return record;
+        //try {
+        //    latch.await();
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
+        //}
+
+        return result.get();
+    }
+
+    /**
+     * Dispatch the request to the downstream REST layers.
+     *
+     * @param context routing context instance
+     * @param path    relative path
+     * @param client  relevant HTTP client
+     */
+    private Buffer doDispatch(RoutingContext context, String path, HttpClient client, Future<Object> cbFuture) {
+        AtomicReference<Buffer> result = new AtomicReference<>();
+        HttpClientRequest toReq = client
+            .request(context.request().method(), path, response -> {
+                response.bodyHandler(body -> {
+                    if (response.statusCode() >= 500) { // api endpoint server error, circuit breaker should fail
+                        cbFuture.fail(response.statusCode() + ": " + body.toString());
+                    } else {
+                        HttpServerResponse toRsp = context.response()
+                                .setStatusCode(response.statusCode());
+                        response.headers().forEach(header -> {
+                            toRsp.putHeader(header.getKey(), header.getValue());
+                        });
+                        logger.info("Received " + body);
+                        result.set(body);
+                        // send response
+                        toRsp.end(body);
+                        cbFuture.complete();
+                    }
+                    ServiceDiscovery.releaseServiceObject(discovery, client);
+                });
+            });
+        // set headers
+        context.request().headers().forEach(header -> {
+            toReq.putHeader(header.getKey(), header.getValue());
+        });
+        if (context.user() != null) {
+            toReq.putHeader("user-principal", context.user().principal().encode());
+        }
+        // send request
+        if (context.getBody() == null) {
+            toReq.end();
+        } else {
+            toReq.end(context.getBody());
+        }
+
+        return result.get();
     }
 
     public void unPublish(Record record){
@@ -169,6 +248,58 @@ public class RestApiServiceDiscovery {
         Future<List<Record>> future = Future.future();
         discovery.getRecords(record -> record.getType().equals(HttpEndpoint.TYPE), future.completer());
         return future;
+    }
+
+    // helper method dealing with failure
+
+    protected void badRequest(RoutingContext context, Throwable ex) {
+        context.response().setStatusCode(400)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+    }
+
+    protected void notFound(RoutingContext context) {
+        context.response().setStatusCode(404)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("message", "not_found").encodePrettily());
+    }
+
+    protected void internalError(RoutingContext context, Throwable ex) {
+        context.response().setStatusCode(500)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+    }
+
+    protected void notImplemented(RoutingContext context) {
+        context.response().setStatusCode(501)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("message", "not_implemented").encodePrettily());
+    }
+
+    protected void badGateway(Throwable ex, RoutingContext context) {
+        ex.printStackTrace();
+        context.response()
+            .setStatusCode(502)
+            .putHeader("content-type", "application/json")
+            .end(new JsonObject().put("error", "bad_gateway")
+                    //.put("message", ex.getMessage())
+                    .encodePrettily());
+    }
+
+    protected void serviceUnavailable(RoutingContext context) {
+        context.fail(503);
+    }
+
+    protected void serviceUnavailable(RoutingContext context, Throwable ex) {
+        context.response().setStatusCode(503)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+    }
+
+    protected void serviceUnavailable(RoutingContext context, String cause) {
+        context.response().setStatusCode(503)
+                .putHeader("content-type", "application/json")
+                .end(new JsonObject().put("error", cause).encodePrettily());
     }
 
 }

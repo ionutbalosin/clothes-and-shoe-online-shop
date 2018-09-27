@@ -3,10 +3,10 @@ package org.ib.vertx.httpclientshop;
 import com.netflix.hystrix.HystrixCommand;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.servicediscovery.Record;
 import org.apache.log4j.Logger;
 import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
 import org.ib.vertx.microservicecommonblueprint.RestApiHystrixCommand;
@@ -14,7 +14,6 @@ import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class HttpClientApiVerticle extends AbstractVerticle {
 
@@ -60,44 +59,13 @@ public class HttpClientApiVerticle extends AbstractVerticle {
     }
 
     private void orderShoe(RoutingContext routingContext) {
-        performRestCall(routingContext, "/orderShoe");
+        //performRestCall(routingContext, "/orderShoe");
+        Buffer result = serviceDiscovery.dispatchRequests(routingContext, "/provideShoe");
     }
 
     private void orderHat(RoutingContext routingContext) {
-        performRestCall(routingContext, "/orderHat");
-        serviceDiscovery.getAllEndpoints().setHandler(ar -> {
-            if (ar.succeeded()) {
-                List<Record> recordList = ar.result();
-                System.out.println("Service Discovery Endpoints:");
-                for (Record rec : recordList)
-                    System.out.println(rec.getLocation());
-
-                // get relative path and retrieve prefix to dispatch client
-                String path = routingContext.request().uri();
-                String prefix = (path.split("/"))[0];
-                String newPath = path.substring(prefix.length());
-                System.out.println("path " + path);
-                System.out.println("prefix " + prefix);
-                System.out.println("newPath " + newPath);
-
-                Optional<Record> client = recordList.stream()
-                    .filter(record -> record.getMetadata().getString("api.name") != null)
-                    .filter(record -> record.getMetadata().getString("api.name").equals(prefix))
-                    .findAny(); // simple load balance
-
-                if (client.isPresent()) {
-                    System.out.println("FOUND ");
-                    System.out.println(client.get());
-                    //doDispatch(context, newPath, discovery.getReference(client.get()).get(), future);
-                } else {
-                    System.out.println("NOT FOUND ");
-                    //notFound(context);
-                    //future.complete();
-                }
-            } else {
-                System.out.println("Nothing found");
-            }
-        });
+        //performRestCall(routingContext, "/orderHat");
+        Buffer result = serviceDiscovery.dispatchRequests(routingContext, "/provideHat");
     }
 
     private void performRestCall(RoutingContext routingContext, String requestURI){

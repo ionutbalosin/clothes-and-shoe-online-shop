@@ -20,7 +20,7 @@ public class HatVerticle extends AbstractVerticle {
 
     private static final String SERVICE_NAME = "hat-provider";
 
-    private static final String API_ORDER_HAT = "/orderHat";
+    private static final String API_PROVIDE_HAT = "/provideHat";
     private static final String API_HAT_MENU = "/hatMenu";
 
     @Override
@@ -29,7 +29,7 @@ public class HatVerticle extends AbstractVerticle {
         Router router = Router.router(vertx);
 
         // Record endpoints.
-        router.get(API_ORDER_HAT).handler(this::orderHat);
+        router.get(API_PROVIDE_HAT).handler(this::orderHat);
         router.get(API_HAT_MENU).handler(this::hatMenu);
 
         String host = config().getString("http.address", "localhost");
