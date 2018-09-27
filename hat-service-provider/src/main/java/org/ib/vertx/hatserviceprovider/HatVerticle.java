@@ -19,6 +19,7 @@ public class HatVerticle extends AbstractVerticle {
     private HttpServerManager serverManager;
 
     private static final String SERVICE_NAME = "hat-provider";
+    private static final String API_NAME = "hat-provider";
 
     private static final String API_PROVIDE_HAT = "/provideHat";
     private static final String API_HAT_MENU = "/hatMenu";
@@ -41,7 +42,7 @@ public class HatVerticle extends AbstractVerticle {
 
         // create HTTP server and publish REST service
         serverManager.createHttpServer(router, host, port)
-            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port))
+            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
         logger.info(HatVerticle.class.getName() + " Started");

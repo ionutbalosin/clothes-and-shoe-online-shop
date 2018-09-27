@@ -1,15 +1,12 @@
 package org.ib.vertx.httpclientshop;
 
-import com.netflix.hystrix.HystrixCommand;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
 import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
-import org.ib.vertx.microservicecommonblueprint.RestApiHystrixCommand;
 import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 
 import java.util.ArrayList;
@@ -22,6 +19,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
     private HttpServerManager serverManager;
 
     private static final String SERVICE_NAME = "http-client-shop";
+    private static final String API_NAME = "http-client-shop";
 
     private static final String API_ROOT = "/";
     private static final String API_ORDER_HAT = "/orderHat";
@@ -46,7 +44,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
 
         // create HTTP server and publish REST service
         serverManager.createHttpServer(router, host, port)
-            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port))
+            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
         logger.info(HttpClientApiVerticle.class.getName() + " Started");
@@ -59,37 +57,17 @@ public class HttpClientApiVerticle extends AbstractVerticle {
     }
 
     private void orderShoe(RoutingContext routingContext) {
-        //performRestCall(routingContext, "/orderShoe");
-        Buffer result = serviceDiscovery.dispatchRequests(routingContext, "/provideShoe");
+        serviceDiscovery.dispatchRequests(routingContext, "/shoe-provider/provideShoe");
     }
 
     private void orderHat(RoutingContext routingContext) {
-        //performRestCall(routingContext, "/orderHat");
-        Buffer result = serviceDiscovery.dispatchRequests(routingContext, "/provideHat");
-    }
-
-    private void performRestCall(RoutingContext routingContext, String requestURI){
-        vertx.runOnContext(v -> {
-            HystrixCommand<String> command = new RestApiHystrixCommand(vertx, 8080, "localhost", requestURI);
-            vertx.<String>executeBlocking(
-                    future -> future.complete(command.execute()),
-                    ar -> {
-                        // back on the event loop
-                        String result = ar.result();
-                        logger.info(result);
-                        routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                            .end(result);
-                    }
-            );
-        });
+        serviceDiscovery.dispatchRequests(routingContext, "/hat-provider/provideHat");
     }
 
     @Override
     public void stop() {
         logger.info(HttpClientApiVerticle.class.getName() + " Stopped");
     }
-
-
 }
 
 class HomePageHelp {

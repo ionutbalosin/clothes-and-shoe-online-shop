@@ -1,11 +1,11 @@
 package org.ib.vertx.microservicecommonblueprint;
 
+import com.netflix.hystrix.HystrixCommand;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RestApiServiceDiscovery {
@@ -39,9 +39,9 @@ public class RestApiServiceDiscovery {
         registeredRecords = new ConcurrentHashSet<>();
     }
 
-    public Future<Void> publishHttpEndpoint(String name, String host, int port) {
+    public Future<Void> publishHttpEndpoint(String name, String host, int port, String apiName) {
         Record record = HttpEndpoint.createRecord(name, host, port, "/",
-            new JsonObject().put("api.name", verticle.config().getString("api.name", ""))
+            new JsonObject().put("api.name", verticle.config().getString("api.name", apiName))
         );
         return publish(record);
     }
@@ -116,64 +116,43 @@ public class RestApiServiceDiscovery {
         }
     }
 
-    public Buffer dispatchRequests(RoutingContext context, String path) {
-        AtomicReference<Buffer> result = new AtomicReference<>();
-        // NB: Trick to wait for the asynchronous thread with the HTTP response until sending a Client response
-        CountDownLatch latch = new CountDownLatch(1);
+    public void dispatchRequests(RoutingContext context, String path) {
+        int initialOffset = 1; // length of `/`
         // run with circuit breaker in order to deal with failure
         circuitBreaker.execute(future -> {
             getAllEndpoints().setHandler(ar -> {
                 if (ar.succeeded()) {
                     List<Record> recordList = ar.result();
                     // get relative path and retrieve prefix to dispatch client
-                    logger.info("Creating request to URI " + path);
-
-                    String prefix = (path.split("/"))[0];
+                    String prefix = (path.substring(initialOffset).split("/"))[0];
                     // generate new relative path
-                    String newPath = path.substring(prefix.length());
+                    String newPath = path.substring(initialOffset + prefix.length());
                     // get one relevant HTTP client, may not exist
                     Optional<Record> client = recordList.stream()
                         .filter(record -> record.getMetadata().getString("api.name") != null)
                         .filter(record -> record.getMetadata().getString("api.name").equals(prefix))
                         .findAny(); // simple load balance
+                    logger.debug("Creating request to path=[" + path + "] and prefix=[" + prefix + "] and newPath=[" + newPath + "]");
                     if (client.isPresent()) {
-                        logger.info("Creating request to " + client.get().getLocation());
-                        result.set(doDispatch(context, newPath, discovery.getReference(client.get()).get(), future));
+                        logger.info("Dispatching request to [" + client.get().getLocation() + "] for path=[" + newPath + "]");
+                        doDispatch(context, newPath, discovery.getReference(client.get()).get(), future);
                     } else {
-                        logger.info("Client not found");
+                        logger.warn("Client for path [" + path + "] not found");
                         notFound(context);
                         future.complete();
                     }
                 } else {
                     future.fail(ar.cause());
                 }
-                latch.countDown();
             });
         }).setHandler(ar -> {
             if (ar.failed()) {
                 badGateway(ar.cause(), context);
-                latch.countDown();
             }
         });
-
-        //try {
-        //    latch.await();
-        //} catch (InterruptedException e) {
-        //    e.printStackTrace();
-        //}
-
-        return result.get();
     }
 
-    /**
-     * Dispatch the request to the downstream REST layers.
-     *
-     * @param context routing context instance
-     * @param path    relative path
-     * @param client  relevant HTTP client
-     */
-    private Buffer doDispatch(RoutingContext context, String path, HttpClient client, Future<Object> cbFuture) {
-        AtomicReference<Buffer> result = new AtomicReference<>();
+    private void doDispatch(RoutingContext context, String path, HttpClient client, Future<Object> cbFuture) {
         HttpClientRequest toReq = client
             .request(context.request().method(), path, response -> {
                 response.bodyHandler(body -> {
@@ -181,14 +160,15 @@ public class RestApiServiceDiscovery {
                         cbFuture.fail(response.statusCode() + ": " + body.toString());
                     } else {
                         HttpServerResponse toRsp = context.response()
-                                .setStatusCode(response.statusCode());
+                            .setStatusCode(response.statusCode());
                         response.headers().forEach(header -> {
                             toRsp.putHeader(header.getKey(), header.getValue());
                         });
-                        logger.info("Received " + body);
-                        result.set(body);
+                        String bodyOutput = String.format("[HttpClientShop-%d] - %s", ThreadLocalRandom.current().nextInt(), body.toString());
+                        logger.info("Received " + bodyOutput);
                         // send response
-                        toRsp.end(body);
+                        toRsp.putHeader("content-type", "text/plain");
+                        toRsp.end(bodyOutput);
                         cbFuture.complete();
                     }
                     ServiceDiscovery.releaseServiceObject(discovery, client);
@@ -207,8 +187,22 @@ public class RestApiServiceDiscovery {
         } else {
             toReq.end(context.getBody());
         }
+    }
 
-        return result.get();
+    private void dispatchRequests2(RoutingContext routingContext, String requestURI){
+        verticle.getVertx().runOnContext(v -> {
+            HystrixCommand<String> command = new RestApiHystrixCommand(verticle.getVertx(), 8080, "localhost", requestURI);
+            verticle.getVertx().<String>executeBlocking(
+                    future -> future.complete(command.execute()),
+                    ar -> {
+                        // back on the event loop
+                        String result = ar.result();
+                        logger.info(result);
+                        routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
+                            .end(result);
+                    }
+            );
+        });
     }
 
     public void unPublish(Record record){
