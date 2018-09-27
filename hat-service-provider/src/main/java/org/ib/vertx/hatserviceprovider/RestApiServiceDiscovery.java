@@ -1,6 +1,5 @@
-package org.ib.vertx.httpclientshop;
+package org.ib.vertx.hatserviceprovider;
 
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonObject;
@@ -11,7 +10,6 @@ import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import org.apache.log4j.Logger;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -83,12 +81,6 @@ public class RestApiServiceDiscovery {
         });
 
         return Optional.of(httpClient.get());
-    }
-
-    public Future<List<Record>> getAllEndpoints() {
-        Future<List<Record>> future = Future.future();
-        discovery.getRecords(record -> record.getType().equals(HttpEndpoint.TYPE), future.completer());
-        return future;
     }
 
 }

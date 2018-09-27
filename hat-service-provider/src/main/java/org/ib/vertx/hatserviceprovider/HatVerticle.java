@@ -19,8 +19,14 @@ public class HatVerticle extends AbstractVerticle {
 
         // Create a router object.
         Router router = Router.router(vertx);
+        RestApiServiceDiscovery serviceDiscovery = new RestApiServiceDiscovery(vertx);
+
         router.get("/orderHat").handler(this::orderHat);
         router.get("/hatMenu").handler(this::hatMenu);
+
+        serviceDiscovery.publish("hat-service-provider1", "localhost", config().getInteger("http.port", 8080), "/");
+        serviceDiscovery.publish("hat-service-provider2", "localhost", config().getInteger("http.port", 8080), "/orderHat");
+        serviceDiscovery.publish("hat-service-provider3", "localhost", config().getInteger("http.port", 8080), "/orderShoe");
 
         // Create the HTTP server and pass the "accept" method to the request handler.
         vertx

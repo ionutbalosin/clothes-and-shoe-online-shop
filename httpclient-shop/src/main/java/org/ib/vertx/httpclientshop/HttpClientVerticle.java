@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.servicediscovery.Record;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -14,12 +15,13 @@ import java.util.List;
 public class HttpClientVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HttpClientVerticle.class);
+    public RestApiServiceDiscovery serviceDiscovery;
 
     @Override
     public void start(Future<Void> startFuture) {
         // Create a router object.
         Router router = Router.router(vertx);
-        RestApiServiceDiscovery serviceDiscovery = new RestApiServiceDiscovery(vertx);
+        serviceDiscovery = new RestApiServiceDiscovery(vertx);
 
         // Record endpoints.
         router.get("/").handler(this::home);
@@ -30,8 +32,6 @@ public class HttpClientVerticle extends AbstractVerticle {
         serviceDiscovery.publish("httpclient-shop2", "localhost", config().getInteger("http.port", 8081), "/orderHat");
         serviceDiscovery.publish("httpclient-shop3", "localhost", config().getInteger("http.port", 8081), "/orderShoe");
 
-        serviceDiscovery.getService("orderHat");
-        serviceDiscovery.getService("orderShoe");
         // Create the HTTP server and pass the "accept" method to the request handler.
         vertx
             .createHttpServer()
@@ -64,6 +64,16 @@ public class HttpClientVerticle extends AbstractVerticle {
 
     private void orderHat(RoutingContext routingContext) {
         performRestCall(routingContext, "/orderHat");
+        serviceDiscovery.getAllEndpoints().setHandler(ar -> {
+            if (ar.succeeded()) {
+                List<Record> recordList = ar.result();
+                System.out.println("Service Discovery Endpoints:");
+                for (Record rec : recordList)
+                    System.out.println(rec.getLocation());
+            } else {
+                System.out.println("Nothing found");
+            }
+        });
     }
 
     private void performRestCall(RoutingContext routingContext, String requestURI){
