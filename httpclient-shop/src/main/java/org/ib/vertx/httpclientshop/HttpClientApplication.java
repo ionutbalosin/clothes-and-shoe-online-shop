@@ -6,7 +6,7 @@ public class HttpClientApplication {
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle(new HttpClientVerticle());
+        vertx.deployVerticle(new HttpClientApiVerticle());
     }
 
 }

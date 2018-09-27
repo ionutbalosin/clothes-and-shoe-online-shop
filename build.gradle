@@ -38,6 +38,19 @@ subprojects {
 	}
 }
 
+project(':microservice-common-blueprint') {
+
+    dependencies {
+        compile('io.vertx:vertx-core:3.5.3')
+        compile('io.vertx:vertx-web:3.5.3')
+        compile('io.vertx:vertx-service-discovery:3.5.3')
+        compile('com.netflix.hystrix:hystrix-core:1.5.12')
+        compile('log4j:log4j:1.2.17')
+        compile('org.apache.logging.log4j:log4j-api:2.7')
+        compile('org.apache.logging.log4j:log4j-core:2.7')
+    }
+}
+
 project(':hat-service-provider') {
     apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -53,6 +66,7 @@ project(':hat-service-provider') {
     }
 
     dependencies {
+        compile project(':microservice-common-blueprint')
         compile('io.vertx:vertx-core:3.5.3')
         compile('io.vertx:vertx-web:3.5.3')
         compile('io.vertx:vertx-service-discovery:3.5.3')
@@ -80,16 +94,17 @@ project(':httpclient-shop') {
     }
 
     dependencies {
+        compile project(':microservice-common-blueprint')
         compile('io.vertx:vertx-core:3.5.3')
         compile('io.vertx:vertx-web:3.5.3')
         compile('io.vertx:vertx-service-discovery:3.5.3')
         compile('io.vertx:vertx-service-discovery-backend-redis:3.5.3')
+        compile('com.netflix.hystrix:hystrix-core:1.5.12')
         runtime('io.vertx:vertx-rx-java2:3.5.3')
         runtime('io.reactivex.rxjava2:rxjava:2.2.2')
         compile('log4j:log4j:1.2.17')
         compile('org.apache.logging.log4j:log4j-api:2.7')
         compile('org.apache.logging.log4j:log4j-core:2.7')
-        compile('com.netflix.hystrix:hystrix-core:1.5.12')
     }
 }
 

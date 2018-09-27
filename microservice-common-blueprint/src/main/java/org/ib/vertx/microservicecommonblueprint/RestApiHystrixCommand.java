@@ -1,4 +1,4 @@
-package org.ib.vertx.httpclientshop;
+package org.ib.vertx.microservicecommonblueprint;
 
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
@@ -67,8 +67,8 @@ public class RestApiHystrixCommand extends HystrixCommand<String> {
 
             }
         })
-                .exceptionHandler(errorHandler)
-                .end();
+        .exceptionHandler(errorHandler)
+        .end();
 
         latch.await();
 

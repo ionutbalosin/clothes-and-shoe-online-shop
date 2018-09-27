@@ -8,48 +8,49 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.servicediscovery.Record;
 import org.apache.log4j.Logger;
+import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
+import org.ib.vertx.microservicecommonblueprint.RestApiHystrixCommand;
+import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class HttpClientVerticle extends AbstractVerticle {
+public class HttpClientApiVerticle extends AbstractVerticle {
 
-    public final static Logger logger = Logger.getLogger(HttpClientVerticle.class);
-    public RestApiServiceDiscovery serviceDiscovery;
+    public final static Logger logger = Logger.getLogger(HttpClientApiVerticle.class);
+    private RestApiServiceDiscovery serviceDiscovery;
+    private HttpServerManager serverManager;
+
+    private static final String SERVICE_NAME = "http-client-shop";
+
+    private static final String API_ROOT = "/";
+    private static final String API_ORDER_HAT = "/orderHat";
+    private static final String API_ORDER_SHOE = "/orderShoe";
 
     @Override
     public void start(Future<Void> startFuture) {
         // Create a router object.
         Router router = Router.router(vertx);
-        serviceDiscovery = new RestApiServiceDiscovery(vertx);
 
         // Record endpoints.
-        router.get("/").handler(this::home);
-        router.get("/orderHat").handler(this::orderHat);
-        router.get("/orderShoe").handler(this::orderShoe);
+        router.get(API_ROOT).handler(this::home);
+        router.get(API_ORDER_HAT).handler(this::orderHat);
+        router.get(API_ORDER_SHOE).handler(this::orderShoe);
 
-        serviceDiscovery.publish("httpclient-shop1", "localhost", config().getInteger("http.port", 8081), "/");
-        serviceDiscovery.publish("httpclient-shop2", "localhost", config().getInteger("http.port", 8081), "/orderHat");
-        serviceDiscovery.publish("httpclient-shop3", "localhost", config().getInteger("http.port", 8081), "/orderShoe");
+        String host = config().getString("http.address", "localhost");
+        int port = config().getInteger("http.port", 8081);
 
-        // Create the HTTP server and pass the "accept" method to the request handler.
-        vertx
-            .createHttpServer()
-            .requestHandler(router::accept)
-            .listen(
-                    // Retrieve the port from the configuration,
-                    // default to 8081.
-                    config().getInteger("http.port", 8081),
-                    result -> {
-                        if (result.succeeded()) {
-                            startFuture.complete();
-                        } else {
-                            startFuture.fail(result.cause());
-                        }
-                    }
-            );
+        // Create the Service Discovery endpoint and HTTPServerManager
+        serviceDiscovery = new RestApiServiceDiscovery(this);
+        serverManager = new HttpServerManager(this);
 
-        logger.info(HttpClientVerticle.class.getName() + " Started");
+        // create HTTP server and publish REST service
+        serverManager.createHttpServer(router, host, port)
+            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port))
+            .setHandler(startFuture.completer());
+
+        logger.info(HttpClientApiVerticle.class.getName() + " Started");
     }
 
     private void home(RoutingContext routingContext) {
@@ -70,6 +71,29 @@ public class HttpClientVerticle extends AbstractVerticle {
                 System.out.println("Service Discovery Endpoints:");
                 for (Record rec : recordList)
                     System.out.println(rec.getLocation());
+
+                // get relative path and retrieve prefix to dispatch client
+                String path = routingContext.request().uri();
+                String prefix = (path.split("/"))[0];
+                String newPath = path.substring(prefix.length());
+                System.out.println("path " + path);
+                System.out.println("prefix " + prefix);
+                System.out.println("newPath " + newPath);
+
+                Optional<Record> client = recordList.stream()
+                    .filter(record -> record.getMetadata().getString("api.name") != null)
+                    .filter(record -> record.getMetadata().getString("api.name").equals(prefix))
+                    .findAny(); // simple load balance
+
+                if (client.isPresent()) {
+                    System.out.println("FOUND ");
+                    System.out.println(client.get());
+                    //doDispatch(context, newPath, discovery.getReference(client.get()).get(), future);
+                } else {
+                    System.out.println("NOT FOUND ");
+                    //notFound(context);
+                    //future.complete();
+                }
             } else {
                 System.out.println("Nothing found");
             }
@@ -94,8 +118,10 @@ public class HttpClientVerticle extends AbstractVerticle {
 
     @Override
     public void stop() {
-        logger.info(HttpClientVerticle.class.getName() + " Stopped");
+        logger.info(HttpClientApiVerticle.class.getName() + " Stopped");
     }
+
+
 }
 
 class HomePageHelp {

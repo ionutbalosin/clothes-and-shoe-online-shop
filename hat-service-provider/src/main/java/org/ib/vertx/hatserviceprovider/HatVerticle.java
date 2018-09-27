@@ -6,6 +6,8 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
+import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
+import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,39 +15,36 @@ import java.util.concurrent.ThreadLocalRandom;
 public class HatVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HatProviderApplication.class);
+    public RestApiServiceDiscovery serviceDiscovery;
+    private HttpServerManager serverManager;
+
+    private static final String SERVICE_NAME = "hat-provider";
+
+    private static final String API_ORDER_HAT = "/orderHat";
+    private static final String API_HAT_MENU = "/hatMenu";
 
     @Override
     public void start(Future<Void> startFuture) {
-
         // Create a router object.
         Router router = Router.router(vertx);
-        RestApiServiceDiscovery serviceDiscovery = new RestApiServiceDiscovery(vertx);
 
-        router.get("/orderHat").handler(this::orderHat);
-        router.get("/hatMenu").handler(this::hatMenu);
+        // Record endpoints.
+        router.get(API_ORDER_HAT).handler(this::orderHat);
+        router.get(API_HAT_MENU).handler(this::hatMenu);
 
-        serviceDiscovery.publish("hat-service-provider1", "localhost", config().getInteger("http.port", 8080), "/");
-        serviceDiscovery.publish("hat-service-provider2", "localhost", config().getInteger("http.port", 8080), "/orderHat");
-        serviceDiscovery.publish("hat-service-provider3", "localhost", config().getInteger("http.port", 8080), "/orderShoe");
+        String host = config().getString("http.address", "localhost");
+        int port = config().getInteger("http.port", 8080);
 
-        // Create the HTTP server and pass the "accept" method to the request handler.
-        vertx
-            .createHttpServer()
-            .requestHandler(router::accept)
-            .listen(
-                    // Retrieve the port from the configuration,
-                    // default to 8080.
-                    config().getInteger("http.port", 8080),
-                    result -> {
-                        if (result.succeeded()) {
-                            startFuture.complete();
-                        } else {
-                            startFuture.fail(result.cause());
-                        }
-                    }
-            );
+        // Create the Service Discovery endpoint
+        serviceDiscovery = new RestApiServiceDiscovery(this);
+        serverManager = new HttpServerManager(this);
 
-        logger.info("Verticle Started");
+        // create HTTP server and publish REST service
+        serverManager.createHttpServer(router, host, port)
+            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port))
+            .setHandler(startFuture.completer());
+
+        logger.info(HatVerticle.class.getName() + " Started");
     }
 
     private void hatMenu(RoutingContext routingContext) {
