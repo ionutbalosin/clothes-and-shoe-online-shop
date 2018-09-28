@@ -25,8 +25,11 @@ The entire communication is based on REST calls.
 ```
 $ cd scripts/
 $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [useJMC]
+$ ./bootstrap-service.sh <GROUP_ID> <VERSION> [true||false]
+```
 
- Examples of starting all services without JMC:
+Examples of starting all services without JMC:
+```
     $ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT
     $ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT
     $ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT
