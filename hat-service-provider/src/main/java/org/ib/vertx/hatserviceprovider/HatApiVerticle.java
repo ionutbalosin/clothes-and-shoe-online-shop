@@ -57,7 +57,7 @@ public class HatApiVerticle extends AbstractVerticle {
     private void orderHat(RoutingContext routingContext) {
         routingContext.response()
             .putHeader("content-type", "application/json; charset=utf-8")
-            .end(String.format("[HatProvider][%d]-%s", ThreadLocalRandom.current().nextInt(9999), "RedHat"));
+            .end(String.format("[HatProvider][ID-%d]-%s", ThreadLocalRandom.current().nextInt(99999), "RedHat item is provided by the owner to caller"));
     }
 
     @Override

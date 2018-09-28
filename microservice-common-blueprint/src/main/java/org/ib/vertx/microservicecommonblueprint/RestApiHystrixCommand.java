@@ -60,7 +60,7 @@ public class RestApiHystrixCommand extends HystrixCommand<String> {
 
                 response.endHandler( handler -> {
                     // Now all the body has been read
-                    String responseString = String.format("[%s][%d]-%s", Thread.currentThread().getName(), ThreadLocalRandom.current().nextInt(999), totalBuffer.toString());
+                    String responseString = String.format("[%s][ID-%d]-%s", Thread.currentThread().getName(), ThreadLocalRandom.current().nextInt(9999), totalBuffer.toString());
                     result.set(responseString);
                     latch.countDown();
                 });

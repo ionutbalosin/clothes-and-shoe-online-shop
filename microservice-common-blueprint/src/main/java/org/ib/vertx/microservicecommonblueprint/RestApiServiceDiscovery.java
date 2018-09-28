@@ -167,9 +167,9 @@ public class RestApiServiceDiscovery {
                         });
                         toRsp.putHeader("content-type", "application/json; charset=utf-8");
 
-                        String bodyOutput = String.format("[%d]-%s", ThreadLocalRandom.current().nextInt(9999), body.toString());
+                        String bodyOutput = String.format("[ID-%d]-%s", ThreadLocalRandom.current().nextInt(99999), body.toString());
                         logger.info("Received original body " + body.toString());
-                        logger.info("Transformed body" + Buffer.buffer(bodyOutput).toString());
+                        logger.info("Transformed body " + Buffer.buffer(bodyOutput).toString());
                         toRsp.end(Buffer.buffer(bodyOutput));
                         cbFuture.complete();
                     }
