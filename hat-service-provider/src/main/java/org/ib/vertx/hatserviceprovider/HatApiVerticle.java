@@ -45,6 +45,11 @@ public class HatApiVerticle extends AbstractVerticle {
         logger.info(HatApiVerticle.class.getName()  + " started on port " + port);
     }
 
+    @Override
+    public void stop(Future<Void> future) {
+        helperVerticle.stop(future);
+    }
+
     private void hatMenu(RoutingContext routingContext) {
         routingContext.response()
             .putHeader("content-type", "application/json; charset=utf-8")

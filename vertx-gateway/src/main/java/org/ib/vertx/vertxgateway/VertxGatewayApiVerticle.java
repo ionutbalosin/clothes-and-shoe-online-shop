@@ -39,6 +39,11 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
         logger.info(VertxGatewayApiVerticle.class.getName() + " started on port " + port);
     }
 
+    @Override
+    public void stop(Future<Void> future) {
+        helperVerticle.stop(future);
+    }
+
     private void dispatch(RoutingContext routingContext) {
         String uriPath = routingContext.request().uri();
         logger.info("Dispatching request for uri " + uriPath);

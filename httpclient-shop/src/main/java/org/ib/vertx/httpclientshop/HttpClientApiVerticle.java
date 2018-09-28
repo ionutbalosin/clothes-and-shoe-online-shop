@@ -47,6 +47,11 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         logger.info(HttpClientApiVerticle.class.getName()  + " started on port " + port);
     }
 
+    @Override
+    public void stop(Future<Void> future) {
+        helperVerticle.stop(future);
+    }
+
     private void home(RoutingContext routingContext) {
         routingContext.response()
             .putHeader("content-type", "application/json; charset=utf-8")

@@ -112,7 +112,7 @@ public class RestApiHelperVerticle {
         );
     }
 
-    public void stop(Future<Void> future) throws Exception {
+    public void stop(Future<Void> future) {
         // In current design, the publisher is responsible for removing the service
         List<Future> futures = new ArrayList<>();
         registeredRecords.forEach(record -> {
