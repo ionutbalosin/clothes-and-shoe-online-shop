@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
 import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 
-public class VertxGatewayVerticle extends AbstractVerticle {
+public class VertxGatewayApiVerticle extends AbstractVerticle {
 
-    public final static Logger logger = Logger.getLogger(VertxGatewayVerticle.class);
+    public final static Logger logger = Logger.getLogger(VertxGatewayApiVerticle.class);
     private RestApiServiceDiscovery serviceDiscovery;
     private HttpServerManager serverManager;
 
@@ -34,12 +34,12 @@ public class VertxGatewayVerticle extends AbstractVerticle {
         serviceDiscovery = new RestApiServiceDiscovery(this);
         serverManager = new HttpServerManager(this);
 
-        // create HTTP server and publish REST service
+        // create HTTP server and publish REST HTTP Endpoint
         serverManager.createHttpServer(router, host, port)
             .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
-        logger.info(VertxGatewayVerticle.class.getName() + " started on port " + port);
+        logger.info(VertxGatewayApiVerticle.class.getName() + " started on port " + port);
     }
 
     private void dispatch(RoutingContext routingContext) {
@@ -50,6 +50,6 @@ public class VertxGatewayVerticle extends AbstractVerticle {
 
     @Override
     public void stop() {
-        logger.info(VertxGatewayVerticle.class.getName() + " Stopped");
+        logger.info(VertxGatewayApiVerticle.class.getName() + " stopped");
     }
 }

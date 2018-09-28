@@ -12,7 +12,7 @@ import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class HatVerticle extends AbstractVerticle {
+public class HatApiVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HatProviderApplication.class);
     public RestApiServiceDiscovery serviceDiscovery;
@@ -40,28 +40,28 @@ public class HatVerticle extends AbstractVerticle {
         serviceDiscovery = new RestApiServiceDiscovery(this);
         serverManager = new HttpServerManager(this);
 
-        // create HTTP server and publish REST service
+        // create HTTP server and publish REST HTTP Endpoint
         serverManager.createHttpServer(router, host, port)
             .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
-        logger.info(HatVerticle.class.getName()  + " started on port " + port);
+        logger.info(HatApiVerticle.class.getName()  + " started on port " + port);
     }
 
     private void hatMenu(RoutingContext routingContext) {
         routingContext.response()
             .putHeader("content-type", "application/json; charset=utf-8")
-            .end(Json.encodePrettily(Arrays.asList(new Hat("RedHat", "8 Euro"), new Hat("YellowHat", "8 Euro"))));
+            .end(Json.encodePrettily(Arrays.asList(new Hat("RedHat", "80 Euro"), new Hat("YellowHat", "60 Euro"))));
     }
 
     private void orderHat(RoutingContext routingContext) {
         routingContext.response()
             .putHeader("content-type", "application/json; charset=utf-8")
-            .end(String.format("[HatProvider-%d] - %s", ThreadLocalRandom.current().nextInt(), "RedHat"));
+            .end(String.format("[HatProvider][%d]-%s", ThreadLocalRandom.current().nextInt(9999), "RedHat"));
     }
 
     @Override
     public void stop() throws Exception {
-        logger.info("Verticle Stopped");
+        logger.info(HatApiVerticle.class.getName() + " stopped");
     }
 }

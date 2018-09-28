@@ -6,7 +6,7 @@ public class VertxGatewayApplication {
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle(new VertxGatewayVerticle());
+        vertx.deployVerticle(new VertxGatewayApiVerticle());
     }
 
 }

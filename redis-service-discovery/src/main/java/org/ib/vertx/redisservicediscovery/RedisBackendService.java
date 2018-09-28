@@ -1,9 +1,11 @@
 package org.ib.vertx.redisservicediscovery;
 
+import org.apache.log4j.Logger;
 import redis.embedded.RedisServer;
 
 public class RedisBackendService {
 
+    private final static Logger logger = Logger.getLogger(RedisBackendService.class);
     private static RedisServer server;
 
     public static void main (String [] args) throws Exception {
@@ -13,7 +15,7 @@ public class RedisBackendService {
     static public void startRedis() throws Exception {
         int port = Integer.getInteger(System.getProperty("http.port"), 6379);
         server = new RedisServer(port);
-        System.out.println("Embedded Redis server started on port " + port);
+        logger.info("Embedded Redis server started on port " + port);
         server.start();
     }
 

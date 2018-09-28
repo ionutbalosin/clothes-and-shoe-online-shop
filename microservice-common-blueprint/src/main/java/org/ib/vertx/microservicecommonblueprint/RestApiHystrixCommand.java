@@ -22,7 +22,7 @@ public class RestApiHystrixCommand extends HystrixCommand<String> {
     private final String requestURI;
 
     public RestApiHystrixCommand(Vertx vertx, int port, String host, String requestURI) {
-        super(HystrixCommandGroupKey.Factory.asKey("RestHystrixCommand"));
+        super(HystrixCommandGroupKey.Factory.asKey(RestApiHystrixCommand.class.getName()));
         this.vertx = vertx;
         this.port = port;
         this.host = host;
@@ -60,7 +60,7 @@ public class RestApiHystrixCommand extends HystrixCommand<String> {
 
                 response.endHandler( handler -> {
                     // Now all the body has been read
-                    String responseString = String.format("[HttpClientShop-%d] - %s", ThreadLocalRandom.current().nextInt(), totalBuffer.toString());
+                    String responseString = String.format("[%s][%d]-%s", Thread.currentThread().getName(), ThreadLocalRandom.current().nextInt(999), totalBuffer.toString());
                     result.set(responseString);
                     latch.countDown();
                 });

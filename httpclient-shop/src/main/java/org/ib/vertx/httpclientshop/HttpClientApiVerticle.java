@@ -42,7 +42,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         serviceDiscovery = new RestApiServiceDiscovery(this);
         serverManager = new HttpServerManager(this);
 
-        // create HTTP server and publish REST service
+        // create HTTP server and publish REST HTTP Endpoint
         serverManager.createHttpServer(router, host, port)
             .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
@@ -66,7 +66,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
 
     @Override
     public void stop() {
-        logger.info(HttpClientApiVerticle.class.getName() + " Stopped");
+        logger.info(HttpClientApiVerticle.class.getName() + " stopped");
     }
 }
 

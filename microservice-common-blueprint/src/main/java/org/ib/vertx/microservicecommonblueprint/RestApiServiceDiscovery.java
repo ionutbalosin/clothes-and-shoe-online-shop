@@ -6,6 +6,7 @@ import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -15,7 +16,6 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceDiscoveryOptions;
-import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 import org.apache.log4j.Logger;
 
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class RestApiServiceDiscovery {
 
@@ -60,9 +59,10 @@ public class RestApiServiceDiscovery {
         discovery.publish(record, ar -> {
             if (ar.succeeded()) {
                 registeredRecords.add(record);
-                logger.info("Service <" + ar.result().getName() + "> published");
+                logger.info("Service [" + ar.result().getName() + "] successfully published");
                 future.complete();
             } else {
+                logger.warn("Service [" + ar.result().getName() + "] could not be published");
                 future.fail(ar.cause());
             }
         });
@@ -91,7 +91,7 @@ public class RestApiServiceDiscovery {
         );
     }
 
-    private void stop(Future<Void> future) throws Exception {
+    public void stop(Future<Void> future) throws Exception {
         // In current design, the publisher is responsible for removing the service
         List<Future> futures = new ArrayList<>();
         registeredRecords.forEach(record -> {
@@ -164,11 +164,12 @@ public class RestApiServiceDiscovery {
                         response.headers().forEach(header -> {
                             toRsp.putHeader(header.getKey(), header.getValue());
                         });
-                        String bodyOutput = String.format("[HttpClientShop-%d] - %s", ThreadLocalRandom.current().nextInt(), body.toString());
-                        logger.info("Received " + bodyOutput);
-                        // send response
-                        toRsp.putHeader("content-type", "text/plain");
-                        toRsp.end(bodyOutput);
+                        toRsp.putHeader("content-type", "application/json; charset=utf-8");
+
+                        String bodyOutput = String.format("[%d]-%s", ThreadLocalRandom.current().nextInt(9999), body.toString());
+                        logger.info("Received original body " + body.toString());
+                        logger.info("Transformed body" + Buffer.buffer(bodyOutput).toString());
+                        toRsp.end(Buffer.buffer(bodyOutput));
                         cbFuture.complete();
                     }
                     ServiceDiscovery.releaseServiceObject(discovery, client);
@@ -189,7 +190,7 @@ public class RestApiServiceDiscovery {
         }
     }
 
-    private void dispatchRequests2(RoutingContext routingContext, String requestURI){
+    public void dispatchRequests2(RoutingContext routingContext, String requestURI){
         verticle.getVertx().runOnContext(v -> {
             HystrixCommand<String> command = new RestApiHystrixCommand(verticle.getVertx(), 8080, "localhost", requestURI);
             verticle.getVertx().<String>executeBlocking(
@@ -205,40 +206,7 @@ public class RestApiServiceDiscovery {
         });
     }
 
-    public void unPublish(Record record){
-        discovery.unpublish(record.getRegistration(), ar -> {
-            if (ar.succeeded()) {
-                logger.info("Endpoint " + record.getLocation() + " successfully unpublished");
-            } else {
-                logger.warn("Endpoint " + record.getLocation() + " failed to unpublish");
-            }
-        });
-    }
-
-    public Optional<HttpClient> getService(String name){
-        final AtomicReference<HttpClient> httpClient = new AtomicReference<>();
-
-        discovery.getRecord(new JsonObject().put("name", name), ar -> {
-            if (ar.succeeded()) {
-                if (ar.result() != null) {
-                    // we have a record
-                    logger.info("Found " + ar.result().getLocation());
-                    ServiceReference reference = discovery.getReference(ar.result());
-                    httpClient.set(reference.getAs(HttpClient.class));
-                } else {
-                    // the lookup succeeded, but no matching service
-                    logger.warn("Endpoint lookup succeeded, but no matching service");
-                }
-            } else {
-                // lookup failed
-                logger.info("Endpoint lookup failed");
-            }
-        });
-
-        return Optional.of(httpClient.get());
-    }
-
-    public Future<List<Record>> getAllEndpoints() {
+    private Future<List<Record>> getAllEndpoints() {
         Future<List<Record>> future = Future.future();
         discovery.getRecords(record -> record.getType().equals(HttpEndpoint.TYPE), future.completer());
         return future;
@@ -246,54 +214,54 @@ public class RestApiServiceDiscovery {
 
     // helper method dealing with failure
 
-    protected void badRequest(RoutingContext context, Throwable ex) {
+    private void badRequest(RoutingContext context, Throwable ex) {
         context.response().setStatusCode(400)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
     }
 
-    protected void notFound(RoutingContext context) {
+    private void notFound(RoutingContext context) {
         context.response().setStatusCode(404)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("message", "not_found").encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("message", "not_found").encodePrettily());
     }
 
-    protected void internalError(RoutingContext context, Throwable ex) {
+    private void internalError(RoutingContext context, Throwable ex) {
         context.response().setStatusCode(500)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
     }
 
-    protected void notImplemented(RoutingContext context) {
+    private void notImplemented(RoutingContext context) {
         context.response().setStatusCode(501)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("message", "not_implemented").encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("message", "not_implemented").encodePrettily());
     }
 
-    protected void badGateway(Throwable ex, RoutingContext context) {
+    private void badGateway(Throwable ex, RoutingContext context) {
         ex.printStackTrace();
         context.response()
             .setStatusCode(502)
-            .putHeader("content-type", "application/json")
+            .putHeader("content-type", "application/json; charset=utf-8")
             .end(new JsonObject().put("error", "bad_gateway")
-                    //.put("message", ex.getMessage())
-                    .encodePrettily());
+            .put("message", ex.getMessage())
+            .encodePrettily());
     }
 
-    protected void serviceUnavailable(RoutingContext context) {
+    private void serviceUnavailable(RoutingContext context) {
         context.fail(503);
     }
 
-    protected void serviceUnavailable(RoutingContext context, Throwable ex) {
+    private void serviceUnavailable(RoutingContext context, Throwable ex) {
         context.response().setStatusCode(503)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("error", ex.getMessage()).encodePrettily());
     }
 
-    protected void serviceUnavailable(RoutingContext context, String cause) {
+    private void serviceUnavailable(RoutingContext context, String cause) {
         context.response().setStatusCode(503)
-                .putHeader("content-type", "application/json")
-                .end(new JsonObject().put("error", cause).encodePrettily());
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(new JsonObject().put("error", cause).encodePrettily());
     }
 
 }
