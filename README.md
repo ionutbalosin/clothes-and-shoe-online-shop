@@ -22,11 +22,16 @@ The entire communication is based on REST calls.
 
 ### Run
 
-1. ´$ cd scripts/´
-2. ´$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT´
-3. ´$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT´
-4. ´$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT´
-5. ´$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT´
+```
+$ cd scripts/
+$ ./bootstrap-service.sh <GROUP_ID> <VERSION> [useJMC]
+
+ Examples of starting all services without JMC:
+    $ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT
+    $ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT
+    $ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT
+    $ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT
+```
 
 ### Test
 
