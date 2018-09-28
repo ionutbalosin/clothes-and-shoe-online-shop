@@ -46,7 +46,7 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
 
     private void dispatch(RoutingContext routingContext) {
         String uriPath = routingContext.request().uri();
-        logger.info("Dispatching request for uri " + uriPath);
+        logger.debug("Dispatching request for uri " + uriPath);
         helperVerticle.dispatchRequests(routingContext, uriPath);
     }
 

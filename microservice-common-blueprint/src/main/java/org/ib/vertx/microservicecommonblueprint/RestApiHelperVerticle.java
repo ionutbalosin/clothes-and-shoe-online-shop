@@ -155,7 +155,7 @@ public class RestApiHelperVerticle {
                         .findAny(); // simple load balance
                     logger.debug("Creating request to uriPath=[" + uriPath + "] and prefix=[" + prefix + "] and newPath=[" + newPath + "]");
                     if (client.isPresent()) {
-                        logger.info("Dispatching request to [" + client.get().getLocation() + "] for uriPath=[" + newPath + "]");
+                        logger.debug("Dispatching request to [" + client.get().getLocation() + "] for uriPath=[" + newPath + "]");
                         doDispatch(context, newPath, discovery.getReference(client.get()).get(), future);
                     } else {
                         logger.warn("Client for uriPath [" + uriPath + "] not found, unable to dispatch further the request");
@@ -188,8 +188,8 @@ public class RestApiHelperVerticle {
                         toRsp.putHeader("content-type", "application/json; charset=utf-8");
 
                         String bodyOutput = String.format("[ID-%d]-%s", ThreadLocalRandom.current().nextInt(99999), body.toString());
-                        logger.info("Received original body " + body.toString());
-                        logger.info("Transformed body " + Buffer.buffer(bodyOutput).toString());
+                        logger.debug("Received original body " + body.toString());
+                        logger.debug("Transformed body " + Buffer.buffer(bodyOutput).toString());
                         toRsp.end(Buffer.buffer(bodyOutput));
                         cbFuture.complete();
                     }
@@ -219,7 +219,7 @@ public class RestApiHelperVerticle {
                     ar -> {
                         // back on the event loop
                         String result = ar.result();
-                        logger.info(result);
+                        logger.debug(result);
                         routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
                             .end(result);
                     }

@@ -36,12 +36,21 @@ Examples of starting all services without JMC:
     $ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT
 ```
 
-### Test
+### Smoke Test
 
 Open a browser and check below URLs:
 - http://localhost:9081/provideHat
 - http://localhost:9091/orderHat
 - http://localhost:8771/http-client-shop/orderHat
+
+### Load Test
+
+Please first install 'ab - Apache HTTP server benchmarking tool'
+
+Then open a terminal and launch:
+```
+$ ./ab.exe -n 10000 -c 10 -l http://localhost:8771/http-client-shop/orderHat
+```
 
 ### ToDo
 
