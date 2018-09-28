@@ -10,6 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
 import org.ib.vertx.microservicecommonblueprint.RestApiHelperVerticle;
 
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -51,6 +52,7 @@ public class HatApiVerticle extends AbstractVerticle {
         metricsService = MetricsService.create(vertx);
 
         logger.info(HatApiVerticle.class.getName()  + " started on port " + port);
+        logger.info("JVM running for " + (ManagementFactory.getRuntimeMXBean().getUptime() / 1000.0) + " sec");
     }
 
     @Override
