@@ -127,3 +127,32 @@ project(':redis-service-discovery') {
             compile('com.github.kstyrc:embedded-redis:0.6')
         }
 }
+
+project(':vertx-gateway') {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    shadowJar {
+        classifier = 'fat'
+        mergeServiceFiles {
+            include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+        }
+        archiveName = "${baseName}-${version}.${extension}"
+        manifest {
+            attributes 'Main-Class': 'org.ib.vertx.httpclientshop.HttpClientApplication'
+        }
+    }
+
+    dependencies {
+        compile project(':microservice-common-blueprint')
+        compile('io.vertx:vertx-core:3.5.3')
+        compile('io.vertx:vertx-web:3.5.3')
+        compile('io.vertx:vertx-service-discovery:3.5.3')
+        compile('io.vertx:vertx-service-discovery-backend-redis:3.5.3')
+        compile('com.netflix.hystrix:hystrix-core:1.5.12')
+        runtime('io.vertx:vertx-rx-java2:3.5.3')
+        runtime('io.reactivex.rxjava2:rxjava:2.2.2')
+        compile('log4j:log4j:1.2.17')
+        compile('org.apache.logging.log4j:log4j-api:2.7')
+        compile('org.apache.logging.log4j:log4j-core:2.7')
+    }
+}

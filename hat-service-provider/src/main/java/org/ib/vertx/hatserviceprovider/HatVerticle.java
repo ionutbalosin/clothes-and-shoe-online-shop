@@ -45,7 +45,7 @@ public class HatVerticle extends AbstractVerticle {
             .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
-        logger.info(HatVerticle.class.getName() + " Started");
+        logger.info(HatVerticle.class.getName()  + " started on port " + port);
     }
 
     private void hatMenu(RoutingContext routingContext) {

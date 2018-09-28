@@ -11,8 +11,9 @@ public class RedisBackendService {
     }
 
     static public void startRedis() throws Exception {
-        server = new RedisServer(6379);
-        System.out.println("Created embedded Redis server on port 6379");
+        int port = Integer.getInteger(System.getProperty("http.port"), 6379);
+        server = new RedisServer(port);
+        System.out.println("Embedded Redis server started on port " + port);
         server.start();
     }
 

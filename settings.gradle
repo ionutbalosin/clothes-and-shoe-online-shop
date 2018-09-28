@@ -1,6 +1,7 @@
 rootProject.name = 'clothes-and-shoe-online-shop'
 
+include 'microservice-common-blueprint'
 include 'hat-service-provider'
 include 'httpclient-shop'
 include 'redis-service-discovery'
-include 'microservice-common-blueprint'
+include 'vertx-gateway'

@@ -80,14 +80,14 @@ public class RestApiServiceDiscovery {
             ));
 
         // init circuit breaker instance
-        JsonObject cbOptions = verticle.config().getJsonObject("circuit-breaker") != null ?
+        JsonObject options = verticle.config().getJsonObject("circuit-breaker") != null ?
         verticle.config().getJsonObject("circuit-breaker") : new JsonObject();
-        circuitBreaker = CircuitBreaker.create(cbOptions.getString("name", "circuit-breaker"), verticle.getVertx(),
+        circuitBreaker = CircuitBreaker.create(options.getString("name", "circuit-breaker"), verticle.getVertx(),
             new CircuitBreakerOptions()
-                .setMaxFailures(cbOptions.getInteger("max-failures", 5))
-                .setTimeout(cbOptions.getLong("timeout", 10000L))
+                .setMaxFailures(options.getInteger("max-failures", 5))
+                .setTimeout(options.getLong("timeout", 10000L))
                 .setFallbackOnFailure(true)
-                .setResetTimeout(cbOptions.getLong("reset-timeout", 30000L))
+                .setResetTimeout(options.getLong("reset-timeout", 30000L))
         );
     }
 
@@ -116,28 +116,28 @@ public class RestApiServiceDiscovery {
         }
     }
 
-    public void dispatchRequests(RoutingContext context, String path) {
+    public void dispatchRequests(RoutingContext context, String uriPath) {
         int initialOffset = 1; // length of `/`
         // run with circuit breaker in order to deal with failure
         circuitBreaker.execute(future -> {
             getAllEndpoints().setHandler(ar -> {
                 if (ar.succeeded()) {
                     List<Record> recordList = ar.result();
-                    // get relative path and retrieve prefix to dispatch client
-                    String prefix = (path.substring(initialOffset).split("/"))[0];
-                    // generate new relative path
-                    String newPath = path.substring(initialOffset + prefix.length());
+                    // get relative uriPath and retrieve prefix to dispatch client
+                    String prefix = (uriPath.substring(initialOffset).split("/"))[0];
+                    // generate new relative uriPath
+                    String newPath = uriPath.substring(initialOffset + prefix.length());
                     // get one relevant HTTP client, may not exist
                     Optional<Record> client = recordList.stream()
                         .filter(record -> record.getMetadata().getString("api.name") != null)
                         .filter(record -> record.getMetadata().getString("api.name").equals(prefix))
                         .findAny(); // simple load balance
-                    logger.debug("Creating request to path=[" + path + "] and prefix=[" + prefix + "] and newPath=[" + newPath + "]");
+                    logger.debug("Creating request to uriPath=[" + uriPath + "] and prefix=[" + prefix + "] and newPath=[" + newPath + "]");
                     if (client.isPresent()) {
-                        logger.info("Dispatching request to [" + client.get().getLocation() + "] for path=[" + newPath + "]");
+                        logger.info("Dispatching request to [" + client.get().getLocation() + "] for uriPath=[" + newPath + "]");
                         doDispatch(context, newPath, discovery.getReference(client.get()).get(), future);
                     } else {
-                        logger.warn("Client for path [" + path + "] not found");
+                        logger.warn("Client for uriPath [" + uriPath + "] not found, unable to dispatch further the request");
                         notFound(context);
                         future.complete();
                     }

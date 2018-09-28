@@ -47,7 +47,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
             .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
-        logger.info(HttpClientApiVerticle.class.getName() + " Started");
+        logger.info(HttpClientApiVerticle.class.getName()  + " started on port " + port);
     }
 
     private void home(RoutingContext routingContext) {
