@@ -141,7 +141,7 @@ project(':vertx-gateway') {
         }
         archiveName = "${baseName}-${version}.${extension}"
         manifest {
-            attributes 'Main-Class': 'org.ib.vertx.httpclientshop.HttpClientApplication'
+            attributes 'Main-Class': 'org.ib.vertx.vertxgateway.VertxGatewayApplication'
         }
     }
 

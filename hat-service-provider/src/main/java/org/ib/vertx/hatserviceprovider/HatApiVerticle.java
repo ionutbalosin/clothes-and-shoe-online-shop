@@ -34,7 +34,7 @@ public class HatApiVerticle extends AbstractVerticle {
         router.get(API_HAT_MENU).handler(this::hatMenu);
 
         String host = config().getString("http.address", "localhost");
-        int port = config().getInteger("http.port", 8080);
+        int port = config().getInteger("http.port", 9081);
 
         // Create the Service Discovery endpoint
         serviceDiscovery = new RestApiServiceDiscovery(this);

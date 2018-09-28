@@ -62,7 +62,7 @@ public class RestApiServiceDiscovery {
                 logger.info("Service [" + ar.result().getName() + "] successfully published");
                 future.complete();
             } else {
-                logger.warn("Service [" + ar.result().getName() + "] could not be published");
+                logger.warn("Service [" + ar.result() + "] could not be published");
                 future.fail(ar.cause());
             }
         });
@@ -76,6 +76,7 @@ public class RestApiServiceDiscovery {
             .setBackendConfiguration(
                 new JsonObject()
                     .put("host", "127.0.0.1")
+                    .put("port", 8761) // Redis backend port
                     .put("key", "records")
             ));
 

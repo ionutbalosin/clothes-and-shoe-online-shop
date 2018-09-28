@@ -36,7 +36,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         router.get(API_ORDER_SHOE).handler(this::orderShoe);
 
         String host = config().getString("http.address", "localhost");
-        int port = config().getInteger("http.port", 8081);
+        int port = config().getInteger("http.port", 9091);
 
         // Create the Service Discovery endpoint and HTTPServerManager
         serviceDiscovery = new RestApiServiceDiscovery(this);
