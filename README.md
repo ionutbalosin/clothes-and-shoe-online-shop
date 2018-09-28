@@ -15,7 +15,7 @@ The entire communication is based on REST calls.
 2. Vertx HttpClient – REST client
 3. Redis Backend – service registration and discovery
 4. Vertx Circuit Breaker - for the Circuit Breaker pattern
-5. Vertx Metrics - for reporting metrics to the Dropwizard metrics library
+5. Vertx Dropwizard Metrics - for reporting metrics to /metrics endpoint
 
 ### Build
 
@@ -29,13 +29,15 @@ $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [useJMC]
 $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [true||false]
 ```
 
-Examples of starting all services without JMC:
+Examples of starting all services without Java Mission Control (JMC):
 ```
-    $ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT
-    $ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT
-    $ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT
-    $ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT
+$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT
+$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT
+$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT
+$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT
 ```
+
+To use JMC specify an additional boolean parameter "true".
 
 ### Smoke Test
 
@@ -51,10 +53,11 @@ For real requests across micro-services, open a browser and check below URLs:
 
 ### Load Test
 
-Please first install 'ab - Apache HTTP server benchmarking tool'
+Please first install "ab - Apache HTTP server benchmarking tool"
 
-Then open a terminal and launch:
+Then, open a terminal and launch:
 ```
+$ cd <ab_path>/bin
 $ ./ab.exe -n 10000 -c 10 -l http://localhost:8771/http-client-shop/orderHat
 ```
 
