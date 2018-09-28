@@ -3,6 +3,8 @@ package org.ib.vertx.httpclientshop;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.dropwizard.MetricsService;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
@@ -15,6 +17,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HttpClientApiVerticle.class);
     private RestApiHelperVerticle helperVerticle;
+    private MetricsService metricsService;
 
     private static final String SERVICE_NAME = "http-client-shop";
     private static final String API_NAME = "http-client-shop";
@@ -22,6 +25,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
     private static final String API_ROOT = "/";
     private static final String API_ORDER_HAT = "/orderHat";
     private static final String API_ORDER_SHOE = "/orderShoe";
+    private static final String API_PROVIDE_METRICS = "/metrics";
 
     @Override
     public void start(Future<Void> startFuture) {
@@ -32,6 +36,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         router.get(API_ROOT).handler(this::home);
         router.get(API_ORDER_HAT).handler(this::orderHat);
         router.get(API_ORDER_SHOE).handler(this::orderShoe);
+        router.get(API_PROVIDE_METRICS).handler(this::metrics);
 
         String host = config().getString("http.address", "localhost");
         int port = config().getInteger("http.port", 9091);
@@ -43,6 +48,9 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         helperVerticle.createHttpServer(router, host, port)
             .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
+
+        // Create the metrics service which returns a snapshot of measured objects
+        metricsService = MetricsService.create(vertx);
 
         logger.info(HttpClientApiVerticle.class.getName()  + " started on port " + port);
     }
@@ -64,6 +72,13 @@ public class HttpClientApiVerticle extends AbstractVerticle {
 
     private void orderHat(RoutingContext routingContext) {
         helperVerticle.dispatchRequests(routingContext, "/hat-provider/provideHat");
+    }
+
+    private void metrics(RoutingContext routingContext) {
+        JsonObject metrics = metricsService.getMetricsSnapshot(vertx);
+        routingContext.response()
+            .putHeader("content-type", "application/json; charset=utf-8")
+            .end(Json.encodePrettily(metrics));
     }
 
     @Override

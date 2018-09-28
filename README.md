@@ -15,6 +15,7 @@ The entire communication is based on REST calls.
 2. Vertx HttpClient – REST client
 3. Redis Backend – service registration and discovery
 4. Vertx Circuit Breaker - for the Circuit Breaker pattern
+5. Vertx Metrics - for reporting metrics to the Dropwizard metrics library
 
 ### Build
 
@@ -38,7 +39,12 @@ Examples of starting all services without JMC:
 
 ### Smoke Test
 
-Open a browser and check below URLs:
+For metrics, open a browser and check below URLs:
+- http://localhost:9081/metrics
+- http://localhost:9091/metrics
+- http://localhost:8771/metrics
+
+For real requests across micro-services, open a browser and check below URLs:
 - http://localhost:9081/provideHat
 - http://localhost:9091/orderHat
 - http://localhost:8771/http-client-shop/orderHat

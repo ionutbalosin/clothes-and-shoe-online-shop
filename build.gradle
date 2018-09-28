@@ -48,8 +48,8 @@ project(":microservice-common-blueprint") {
         compile("com.netflix.hystrix:hystrix-core:1.5.12")
         compile("io.vertx:vertx-circuit-breaker:${vertxVersion}")
         compile("log4j:log4j:1.2.17")
-        compile("org.apache.logging.log4j:log4j-api:2.7")
-        compile("org.apache.logging.log4j:log4j-core:2.7")
+        runtime("org.apache.logging.log4j:log4j-api:2.7")
+        runtime("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
@@ -73,11 +73,12 @@ project(":hat-service-provider") {
         compile("io.vertx:vertx-web:${vertxVersion}")
         compile("io.vertx:vertx-service-discovery:${vertxVersion}")
         compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
+        compile("io.vertx:vertx-dropwizard-metrics:${vertxVersion}")
         runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
         runtime("io.reactivex.rxjava2:rxjava:2.2.2")
         compile("log4j:log4j:1.2.17")
-        compile("org.apache.logging.log4j:log4j-api:2.7")
-        compile("org.apache.logging.log4j:log4j-core:2.7")
+        runtime("org.apache.logging.log4j:log4j-api:2.7")
+        runtime("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
@@ -102,11 +103,12 @@ project(":httpclient-shop") {
         compile("io.vertx:vertx-service-discovery:${vertxVersion}")
         compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
         compile("com.netflix.hystrix:hystrix-core:1.5.12")
+        compile("io.vertx:vertx-dropwizard-metrics:${vertxVersion}")
         runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
         runtime("io.reactivex.rxjava2:rxjava:2.2.2")
         compile("log4j:log4j:1.2.17")
-        compile("org.apache.logging.log4j:log4j-api:2.7")
-        compile("org.apache.logging.log4j:log4j-core:2.7")
+        runtime("org.apache.logging.log4j:log4j-api:2.7")
+        runtime("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
@@ -153,10 +155,11 @@ project(":vertx-gateway") {
         compile("io.vertx:vertx-service-discovery:${vertxVersion}")
         compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
         compile("com.netflix.hystrix:hystrix-core:1.5.12")
+        compile("io.vertx:vertx-dropwizard-metrics:${vertxVersion}")
         runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
         runtime("io.reactivex.rxjava2:rxjava:2.2.2")
         compile("log4j:log4j:1.2.17")
-        compile("org.apache.logging.log4j:log4j-api:2.7")
-        compile("org.apache.logging.log4j:log4j-core:2.7")
+        runtime("org.apache.logging.log4j:log4j-api:2.7")
+        runtime("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
