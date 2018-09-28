@@ -18,15 +18,15 @@ The entire communication is based on REST calls.
 
 ### Build
 
-´./gradlew clean build ShadowJar´
+´$ ./gradlew clean build ShadowJar´
 
 ### Run
 
 ´$ cd scripts/´
-´./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT´
-´./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT´
-´./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT´
-´./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT´
+´$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT´
+´$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT´
+´$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT´
+´$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT´
 
 ### Test
 
