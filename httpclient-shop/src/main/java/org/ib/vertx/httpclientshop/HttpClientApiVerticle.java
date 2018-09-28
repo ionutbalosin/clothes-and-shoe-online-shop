@@ -6,8 +6,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
-import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
-import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
+import org.ib.vertx.microservicecommonblueprint.RestApiHelperVerticle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +14,7 @@ import java.util.List;
 public class HttpClientApiVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HttpClientApiVerticle.class);
-    private RestApiServiceDiscovery serviceDiscovery;
-    private HttpServerManager serverManager;
+    private RestApiHelperVerticle helperVerticle;
 
     private static final String SERVICE_NAME = "http-client-shop";
     private static final String API_NAME = "http-client-shop";
@@ -39,12 +37,11 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         int port = config().getInteger("http.port", 9091);
 
         // Create the Service Discovery endpoint and HTTPServerManager
-        serviceDiscovery = new RestApiServiceDiscovery(this);
-        serverManager = new HttpServerManager(this);
+        helperVerticle = new RestApiHelperVerticle(this);
 
         // create HTTP server and publish REST HTTP Endpoint
-        serverManager.createHttpServer(router, host, port)
-            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+        helperVerticle.createHttpServer(router, host, port)
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
         logger.info(HttpClientApiVerticle.class.getName()  + " started on port " + port);
@@ -57,11 +54,11 @@ public class HttpClientApiVerticle extends AbstractVerticle {
     }
 
     private void orderShoe(RoutingContext routingContext) {
-        serviceDiscovery.dispatchRequests(routingContext, "/shoe-provider/provideShoe");
+        helperVerticle.dispatchRequests(routingContext, "/shoe-provider/provideShoe");
     }
 
     private void orderHat(RoutingContext routingContext) {
-        serviceDiscovery.dispatchRequests(routingContext, "/hat-provider/provideHat");
+        helperVerticle.dispatchRequests(routingContext, "/hat-provider/provideHat");
     }
 
     @Override

@@ -1,6 +1,7 @@
 buildscript {
 
     ext {
+        vertxVersion = "3.5.3"
     }
 
     repositories {
@@ -11,21 +12,21 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
     }
 
 }
 
 allprojects {
-    group = 'org.ib'
-    version = '0.0.1-SNAPSHOT'
+    group = "org.ib"
+    version = "0.0.1-SNAPSHOT"
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'idea'
+    apply plugin: "java"
+    apply plugin: "idea"
 
-    defaultTasks 'clean', 'build'
+    defaultTasks "clean", "build"
 
     repositories {
         jcenter()
@@ -34,128 +35,128 @@ subprojects {
     }
 
 	ext {
-		uploadArchivesType = 'app'
+		uploadArchivesType = "app"
 	}
 }
 
-project(':microservice-common-blueprint') {
+project(":microservice-common-blueprint") {
 
     dependencies {
-        compile('io.vertx:vertx-core:3.5.3')
-        compile('io.vertx:vertx-web:3.5.3')
-        compile('io.vertx:vertx-service-discovery:3.5.3')
-        compile('com.netflix.hystrix:hystrix-core:1.5.12')
-        compile('io.vertx:vertx-circuit-breaker:3.5.3')
-        compile('log4j:log4j:1.2.17')
-        compile('org.apache.logging.log4j:log4j-api:2.7')
-        compile('org.apache.logging.log4j:log4j-core:2.7')
+        compile("io.vertx:vertx-core:${vertxVersion}")
+        compile("io.vertx:vertx-web:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery:${vertxVersion}")
+        compile("com.netflix.hystrix:hystrix-core:1.5.12")
+        compile("io.vertx:vertx-circuit-breaker:${vertxVersion}")
+        compile("log4j:log4j:1.2.17")
+        compile("org.apache.logging.log4j:log4j-api:2.7")
+        compile("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
-project(':hat-service-provider') {
-    apply plugin: 'com.github.johnrengelman.shadow'
+project(":hat-service-provider") {
+    apply plugin: "com.github.johnrengelman.shadow"
 
     shadowJar {
-        classifier = 'fat'
+        classifier = "fat"
         mergeServiceFiles {
-            include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+            include "META-INF/services/io.vertx.core.spi.VerticleFactory"
         }
         archiveName = "${baseName}-${version}.${extension}"
         manifest {
-            attributes 'Main-Class': 'org.ib.vertx.hatserviceprovider.HatProviderApplication'
+            attributes "Main-Class": "org.ib.vertx.hatserviceprovider.HatProviderApplication"
         }
     }
 
     dependencies {
-        compile project(':microservice-common-blueprint')
-        compile('io.vertx:vertx-core:3.5.3')
-        compile('io.vertx:vertx-web:3.5.3')
-        compile('io.vertx:vertx-service-discovery:3.5.3')
-        compile('io.vertx:vertx-service-discovery-backend-redis:3.5.3')
-        runtime('io.vertx:vertx-rx-java2:3.5.3')
-        runtime('io.reactivex.rxjava2:rxjava:2.2.2')
-        compile('log4j:log4j:1.2.17')
-        compile('org.apache.logging.log4j:log4j-api:2.7')
-        compile('org.apache.logging.log4j:log4j-core:2.7')
+        compile project(":microservice-common-blueprint")
+        compile("io.vertx:vertx-core:${vertxVersion}")
+        compile("io.vertx:vertx-web:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
+        runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
+        runtime("io.reactivex.rxjava2:rxjava:2.2.2")
+        compile("log4j:log4j:1.2.17")
+        compile("org.apache.logging.log4j:log4j-api:2.7")
+        compile("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
-project(':httpclient-shop') {
-    apply plugin: 'com.github.johnrengelman.shadow'
+project(":httpclient-shop") {
+    apply plugin: "com.github.johnrengelman.shadow"
 
     shadowJar {
-        classifier = 'fat'
+        classifier = "fat"
         mergeServiceFiles {
-            include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+            include "META-INF/services/io.vertx.core.spi.VerticleFactory"
         }
         archiveName = "${baseName}-${version}.${extension}"
         manifest {
-            attributes 'Main-Class': 'org.ib.vertx.httpclientshop.HttpClientApplication'
+            attributes "Main-Class": "org.ib.vertx.httpclientshop.HttpClientApplication"
         }
     }
 
     dependencies {
-        compile project(':microservice-common-blueprint')
-        compile('io.vertx:vertx-core:3.5.3')
-        compile('io.vertx:vertx-web:3.5.3')
-        compile('io.vertx:vertx-service-discovery:3.5.3')
-        compile('io.vertx:vertx-service-discovery-backend-redis:3.5.3')
-        compile('com.netflix.hystrix:hystrix-core:1.5.12')
-        runtime('io.vertx:vertx-rx-java2:3.5.3')
-        runtime('io.reactivex.rxjava2:rxjava:2.2.2')
-        compile('log4j:log4j:1.2.17')
-        compile('org.apache.logging.log4j:log4j-api:2.7')
-        compile('org.apache.logging.log4j:log4j-core:2.7')
+        compile project(":microservice-common-blueprint")
+        compile("io.vertx:vertx-core:${vertxVersion}")
+        compile("io.vertx:vertx-web:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
+        compile("com.netflix.hystrix:hystrix-core:1.5.12")
+        runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
+        runtime("io.reactivex.rxjava2:rxjava:2.2.2")
+        compile("log4j:log4j:1.2.17")
+        compile("org.apache.logging.log4j:log4j-api:2.7")
+        compile("org.apache.logging.log4j:log4j-core:2.7")
     }
 }
 
-project(':redis-service-discovery') {
-        apply plugin: 'com.github.johnrengelman.shadow'
+project(":redis-service-discovery") {
+        apply plugin: "com.github.johnrengelman.shadow"
 
         shadowJar {
-            classifier = 'fat'
+            classifier = "fat"
             mergeServiceFiles {
-                include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+                include "META-INF/services/io.vertx.core.spi.VerticleFactory"
             }
             archiveName = "${baseName}-${version}.${extension}"
             manifest {
-                attributes 'Main-Class': 'org.ib.vertx.redisservicediscovery.RedisBackendService'
+                attributes "Main-Class": "org.ib.vertx.redisservicediscovery.RedisBackendService"
             }
         }
 
         dependencies {
-            compile('com.github.kstyrc:embedded-redis:0.6')
-            compile('log4j:log4j:1.2.17')
-            compile('org.apache.logging.log4j:log4j-api:2.7')
-            compile('org.apache.logging.log4j:log4j-core:2.7')
+            compile("com.github.kstyrc:embedded-redis:0.6")
+            compile("log4j:log4j:1.2.17")
+            compile("org.apache.logging.log4j:log4j-api:2.7")
+            compile("org.apache.logging.log4j:log4j-core:2.7")
         }
 }
 
-project(':vertx-gateway') {
-    apply plugin: 'com.github.johnrengelman.shadow'
+project(":vertx-gateway") {
+    apply plugin: "com.github.johnrengelman.shadow"
 
     shadowJar {
-        classifier = 'fat'
+        classifier = "fat"
         mergeServiceFiles {
-            include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+            include "META-INF/services/io.vertx.core.spi.VerticleFactory"
         }
         archiveName = "${baseName}-${version}.${extension}"
         manifest {
-            attributes 'Main-Class': 'org.ib.vertx.vertxgateway.VertxGatewayApplication'
+            attributes "Main-Class": "org.ib.vertx.vertxgateway.VertxGatewayApplication"
         }
     }
 
     dependencies {
-        compile project(':microservice-common-blueprint')
-        compile('io.vertx:vertx-core:3.5.3')
-        compile('io.vertx:vertx-web:3.5.3')
-        compile('io.vertx:vertx-service-discovery:3.5.3')
-        compile('io.vertx:vertx-service-discovery-backend-redis:3.5.3')
-        compile('com.netflix.hystrix:hystrix-core:1.5.12')
-        runtime('io.vertx:vertx-rx-java2:3.5.3')
-        runtime('io.reactivex.rxjava2:rxjava:2.2.2')
-        compile('log4j:log4j:1.2.17')
-        compile('org.apache.logging.log4j:log4j-api:2.7')
-        compile('org.apache.logging.log4j:log4j-core:2.7')
+        compile project(":microservice-common-blueprint")
+        compile("io.vertx:vertx-core:${vertxVersion}")
+        compile("io.vertx:vertx-web:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery:${vertxVersion}")
+        compile("io.vertx:vertx-service-discovery-backend-redis:${vertxVersion}")
+        compile("com.netflix.hystrix:hystrix-core:1.5.12")
+        runtime("io.vertx:vertx-rx-java2:${vertxVersion}")
+        runtime("io.reactivex.rxjava2:rxjava:2.2.2")
+        compile("log4j:log4j:1.2.17")
+        compile("org.apache.logging.log4j:log4j-api:2.7")
+        compile("org.apache.logging.log4j:log4j-core:2.7")
     }
 }

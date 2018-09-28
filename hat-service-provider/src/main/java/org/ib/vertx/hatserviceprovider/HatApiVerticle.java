@@ -6,8 +6,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
-import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
-import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
+import org.ib.vertx.microservicecommonblueprint.RestApiHelperVerticle;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,8 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class HatApiVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(HatProviderApplication.class);
-    public RestApiServiceDiscovery serviceDiscovery;
-    private HttpServerManager serverManager;
+    private RestApiHelperVerticle helperVerticle;
 
     private static final String SERVICE_NAME = "hat-provider";
     private static final String API_NAME = "hat-provider";
@@ -37,12 +35,11 @@ public class HatApiVerticle extends AbstractVerticle {
         int port = config().getInteger("http.port", 9081);
 
         // Create the Service Discovery endpoint
-        serviceDiscovery = new RestApiServiceDiscovery(this);
-        serverManager = new HttpServerManager(this);
+        helperVerticle = new RestApiHelperVerticle(this);
 
         // create HTTP server and publish REST HTTP Endpoint
-        serverManager.createHttpServer(router, host, port)
-            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+        helperVerticle.createHttpServer(router, host, port)
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
         logger.info(HatApiVerticle.class.getName()  + " started on port " + port);

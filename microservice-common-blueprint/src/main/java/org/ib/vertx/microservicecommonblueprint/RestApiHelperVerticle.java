@@ -9,9 +9,11 @@ import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.impl.ConcurrentHashSet;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.servicediscovery.Record;
 import io.vertx.servicediscovery.ServiceDiscovery;
@@ -25,17 +27,35 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RestApiServiceDiscovery {
+public class RestApiHelperVerticle {
 
-    private final static Logger logger = Logger.getLogger(RestApiServiceDiscovery.class);
+    private final static Logger logger = Logger.getLogger(RestApiHelperVerticle.class);
     private final Set<Record> registeredRecords;
     private final AbstractVerticle verticle;
     private ServiceDiscovery discovery;
     private CircuitBreaker circuitBreaker;
 
-    public RestApiServiceDiscovery(AbstractVerticle verticle) {
+    public RestApiHelperVerticle(AbstractVerticle verticle) {
         this.verticle = verticle;
         registeredRecords = new ConcurrentHashSet<>();
+    }
+
+    public Future<Void> createHttpServer(Router router, String host, int port) {
+        Future<HttpServer> httpServerFuture = Future.future();
+        verticle.getVertx().createHttpServer()
+                .requestHandler(router::accept)
+                .listen(
+                        port,
+                        host,
+                        result -> {
+                            if (result.succeeded()) {
+                                httpServerFuture.complete();
+                            } else {
+                                httpServerFuture.fail(result.cause());
+                            }
+                        }
+                );
+        return httpServerFuture.map(r -> null);
     }
 
     public Future<Void> publishHttpEndpoint(String name, String host, int port, String apiName) {

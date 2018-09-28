@@ -5,14 +5,12 @@ import io.vertx.core.Future;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.log4j.Logger;
-import org.ib.vertx.microservicecommonblueprint.HttpServerManager;
-import org.ib.vertx.microservicecommonblueprint.RestApiServiceDiscovery;
+import org.ib.vertx.microservicecommonblueprint.RestApiHelperVerticle;
 
 public class VertxGatewayApiVerticle extends AbstractVerticle {
 
     public final static Logger logger = Logger.getLogger(VertxGatewayApiVerticle.class);
-    private RestApiServiceDiscovery serviceDiscovery;
-    private HttpServerManager serverManager;
+    private RestApiHelperVerticle helperVerticle;
 
     private static final String SERVICE_NAME = "vertx-gateway";
     private static final String API_NAME = "vertx-gateway";
@@ -31,12 +29,11 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
         int port = config().getInteger("http.port", 8771);
 
         // Create the Service Discovery endpoint and HTTPServerManager
-        serviceDiscovery = new RestApiServiceDiscovery(this);
-        serverManager = new HttpServerManager(this);
+        helperVerticle = new RestApiHelperVerticle(this);
 
         // create HTTP server and publish REST HTTP Endpoint
-        serverManager.createHttpServer(router, host, port)
-            .compose(serverCreated -> serviceDiscovery.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+        helperVerticle.createHttpServer(router, host, port)
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
             .setHandler(startFuture.completer());
 
         logger.info(VertxGatewayApiVerticle.class.getName() + " started on port " + port);
@@ -45,7 +42,7 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
     private void dispatch(RoutingContext routingContext) {
         String uriPath = routingContext.request().uri();
         logger.info("Dispatching request for uri " + uriPath);
-        serviceDiscovery.dispatchRequests(routingContext, uriPath);
+        helperVerticle.dispatchRequests(routingContext, uriPath);
     }
 
     @Override
