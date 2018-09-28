@@ -105,10 +105,10 @@ public class RestApiHelperVerticle {
         verticle.config().getJsonObject("circuit-breaker") : new JsonObject();
         circuitBreaker = CircuitBreaker.create(options.getString("name", "circuit-breaker"), verticle.getVertx(),
             new CircuitBreakerOptions()
-                .setMaxFailures(options.getInteger("max-failures", 5))
-                .setTimeout(options.getLong("timeout", 10000L))
+                .setMaxFailures(options.getInteger("max-failures", 20))
+                .setTimeout(options.getLong("timeout", 500L))
                 .setFallbackOnFailure(true)
-                .setResetTimeout(options.getLong("reset-timeout", 30000L))
+                .setResetTimeout(options.getLong("reset-timeout", 2000L))
         );
     }
 
