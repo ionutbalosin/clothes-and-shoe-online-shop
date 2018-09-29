@@ -22,6 +22,7 @@ echo "*************************************"
 echo "GROUP_ID = "$GROUP_ID
 echo "VERSION = "$VERSION
 echo "JMC_ARGS = "$JMC_ARGS
+echo "JAVA_HOME = "$JAVA_HOME
 echo "*************************************"
 
 # Start Vanilla Java

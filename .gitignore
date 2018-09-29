@@ -2,7 +2,6 @@
 **/build/
 **/target/
 **/out/
-**/*.log
 !gradle/wrapper/gradle-wrapper.jar
 **/.vertx/
 

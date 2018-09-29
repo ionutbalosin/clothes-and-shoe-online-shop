@@ -1,0 +1,4 @@
+2018-09-29 12:03:23 [main] INFO  ConfigRetrieverHelper:30 - Successfully retrieved configuration
+2018-09-29 12:03:23 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:58 - org.ib.vertx.httpclientshop.HttpClientApiVerticle started on port 9091
+2018-09-29 12:03:23 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:59 - JVM running for 5.522 sec
+2018-09-29 12:03:23 [vert.x-eventloop-thread-2] INFO  RestApiHelperVerticle:82 - Service [http-client-shop] successfully published
