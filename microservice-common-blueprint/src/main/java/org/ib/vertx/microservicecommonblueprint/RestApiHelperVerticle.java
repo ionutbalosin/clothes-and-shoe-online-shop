@@ -6,7 +6,6 @@ import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpServer;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class RestApiHelperVerticle {
 
@@ -187,10 +185,11 @@ public class RestApiHelperVerticle {
                         });
                         toRsp.putHeader("content-type", "application/json; charset=utf-8");
 
-                        String bodyOutput = String.format("[ID-%d]-%s", ThreadLocalRandom.current().nextInt(99999), body.toString());
-                        logger.debug("Received original body " + body.toString());
-                        logger.debug("Transformed body " + Buffer.buffer(bodyOutput).toString());
-                        toRsp.end(Buffer.buffer(bodyOutput));
+                        //String bodyOutput = String.format("[%s][ResponseId-%d]-%s", Thread.currentThread().getName(), Thread.currentThread().getName(), ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE),, body.toString());
+                        //logger.debug("Received original body " + body.toString());
+                        //logger.debug("Transformed body " + Buffer.buffer(bodyOutput).toString());
+
+                        toRsp.end(body);
                         cbFuture.complete();
                     }
                     ServiceDiscovery.releaseServiceObject(discovery, client);

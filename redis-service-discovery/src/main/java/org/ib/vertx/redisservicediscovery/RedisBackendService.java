@@ -11,6 +11,7 @@ public class RedisBackendService {
     private static RedisServer server;
 
     public static void main (String [] args) throws Exception {
+        logger.info("Java Version [" + System.getProperty("java.version") + "]");
         startRedis();
     }
 
