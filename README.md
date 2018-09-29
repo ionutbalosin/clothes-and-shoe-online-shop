@@ -29,27 +29,30 @@ $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [useJMC]
 $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [true||false]
 ```
 
-Examples of starting all services without Java Mission Control (JMC):
+Examples of starting all services with Java Mission Control (JMC) as optional parameter:
 ```
-$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT
-$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT
-$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT
-$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT
+$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT [true]
+$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT [true]
+$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT [true]
+$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT [true]
 ```
 
-To use JMC specify an additional boolean parameter "true".
+To start each of these services on a different port, please specify -Dhttp.port=<port> in the shell script!
 
 ### Smoke Test
 
-For metrics, open a browser and check below URLs:
-- http://localhost:9081/metrics
-- http://localhost:9091/metrics
-- http://localhost:8771/metrics
+For checking the metrics, open a browser and check below URLs:
+- http://localhost:9081/metrics hat-service-provider
+- http://localhost:9091/metrics for httpclient-shop
+- http://localhost:8771/metrics for vertx-gateway
 
-For real requests across micro-services, open a browser and check below URLs:
-- http://localhost:9081/provideHat
+To send real requests across micro-services, open a browser and check below URLs:
+- http://localhost:9081/provideHat 
+    Request Route: hat-service-provider
 - http://localhost:9091/orderHat
-- http://localhost:8771/http-client-shop/orderHat
+    Request Route: httpclient-shop -> hat-service-provider
+- http://localhost:8771/http-client-shop/orderHat 
+    Request Route: vertx-gateway -> httpclient-shop -> hat-service-provider
 
 ### Load Test
 
