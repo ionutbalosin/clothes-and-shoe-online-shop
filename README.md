@@ -40,8 +40,9 @@ $ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT [true]
 $ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT [true]
 ```
 
-Please make sure the *redis-service-discovery* is started first!
-To start each of these services on a different port, please specify *-Dhttp.port=<port>* in the shell script!
+Please make sure the **redis-service-discovery** is started first!
+
+To start each of these services on a different port, please specify *-Dhttp.port=HTTP_PORT* in the shell script!
 
 ### Smoke Test
 
