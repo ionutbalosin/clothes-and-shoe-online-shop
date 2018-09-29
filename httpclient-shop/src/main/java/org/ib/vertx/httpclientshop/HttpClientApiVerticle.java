@@ -39,6 +39,8 @@ public class HttpClientApiVerticle extends AbstractVerticle {
         router.get(API_ORDER_SHOE).handler(this::orderShoe);
         router.get(API_PROVIDE_METRICS).handler(this::metrics);
 
+        String serviceName = config().getString("api.name", SERVICE_NAME);
+        String apiName = config().getString("service.name", API_NAME);
         String host = config().getString("http.address", "localhost");
         int port = config().getInteger("http.port", 9091);
 
@@ -47,7 +49,7 @@ public class HttpClientApiVerticle extends AbstractVerticle {
 
         // create HTTP server and publish REST HTTP Endpoint
         helperVerticle.createHttpServer(router, host, port)
-            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(serviceName, host, port, apiName))
             .setHandler(startFuture.completer());
 
         // Create the metrics service which returns a snapshot of measured objects

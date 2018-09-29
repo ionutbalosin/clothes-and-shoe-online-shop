@@ -47,6 +47,7 @@ project(":microservice-common-blueprint") {
         compile("io.vertx:vertx-service-discovery:${vertxVersion}")
         compile("com.netflix.hystrix:hystrix-core:1.5.12")
         compile("io.vertx:vertx-circuit-breaker:${vertxVersion}")
+        compile("io.vertx:vertx-config:${vertxVersion}")
         compile("log4j:log4j:1.2.17")
         runtime("org.apache.logging.log4j:log4j-api:2.7")
         runtime("org.apache.logging.log4j:log4j-core:2.7")

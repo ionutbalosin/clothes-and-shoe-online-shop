@@ -1,0 +1,6 @@
+{
+  "api.name": "vertx-gateway",
+  "service.name": "vertx-gateway",
+  "http.address": "127.0.0.1",
+  "http.port": 8771
+}

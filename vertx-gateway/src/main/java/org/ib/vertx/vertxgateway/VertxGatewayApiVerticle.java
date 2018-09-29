@@ -33,6 +33,8 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
         router.get(API_PROVIDE_METRICS).handler(this::metrics);
         router.get(API_ROOT).handler(this::dispatch);
 
+        String serviceName = config().getString("api.name", SERVICE_NAME);
+        String apiName = config().getString("service.name", API_NAME);
         String host = config().getString("http.address", "localhost");
         int port = config().getInteger("http.port", 8771);
 
@@ -41,7 +43,7 @@ public class VertxGatewayApiVerticle extends AbstractVerticle {
 
         // create HTTP server and publish REST HTTP Endpoint
         helperVerticle.createHttpServer(router, host, port)
-            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(serviceName, host, port, apiName))
             .setHandler(startFuture.completer());
 
         // Create the metrics service which returns a snapshot of measured objects

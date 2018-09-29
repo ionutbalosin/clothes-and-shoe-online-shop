@@ -28,7 +28,9 @@ public class HatApiVerticle extends AbstractVerticle {
     private static final String API_PROVIDE_METRICS = "/metrics";
 
     @Override
-    public void start(Future<Void> startFuture) {
+    public void start(Future<Void> startFuture) throws Exception {
+        super.start();
+
         // Create a router object.
         Router router = Router.router(vertx);
 
@@ -37,6 +39,8 @@ public class HatApiVerticle extends AbstractVerticle {
         router.get(API_HAT_MENU).handler(this::hatMenu);
         router.get(API_PROVIDE_METRICS).handler(this::metrics);
 
+        String serviceName = config().getString("api.name", SERVICE_NAME);
+        String apiName = config().getString("service.name", API_NAME);
         String host = config().getString("http.address", "localhost");
         int port = config().getInteger("http.port", 9081);
 
@@ -45,7 +49,7 @@ public class HatApiVerticle extends AbstractVerticle {
 
         // create HTTP server and publish REST HTTP Endpoint
         helperVerticle.createHttpServer(router, host, port)
-            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(SERVICE_NAME, host, port, API_NAME))
+            .compose(serverCreated -> helperVerticle.publishHttpEndpoint(serviceName, host, port, apiName))
             .setHandler(startFuture.completer());
 
         // Create the metrics service which returns a snapshot of measured objects
