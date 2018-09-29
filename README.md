@@ -20,7 +20,9 @@ The entire communication is based on REST calls.
 
 ### Build
 
-´$ ./gradlew clean build ShadowJar´
+```
+$ ./gradlew clean build ShadowJar
+```
 
 ### Run
 
@@ -60,9 +62,9 @@ To send real requests across micro-services, open a browser and check below URLs
 
 ### Load Test
 
-Please first install *ab - Apache HTTP server benchmarking tool*
-
-Then, open a terminal and launch 1000 requests (4 concurrent):
+First please install *ab - Apache HTTP server benchmarking tool*
+Second, make sure all services are started!
+Third, open a terminal and launch 1000 requests (4 concurrent):
 ```
 $ cd <ab_path>/bin
 $ ./ab.exe -n 10000 -c 10 -l http://localhost:8771/http-client-shop/orderHat
@@ -70,10 +72,10 @@ $ ./ab.exe -n 10000 -c 10 -l http://localhost:8771/http-client-shop/orderHat
 
 ### ToDo
 
-1. Load Balancer - in-house implementation (nothing on the market)
+1. Load Balancer - in-house implementation (nothing already built-in found)
 2. Docker - Docker-ize all services
 3. Tracing
-    - in-house implementation (nothing on the market)
+    - in-house implementation (nothing already built-in found)
 4. Monitoring
     - Prometheus
     - Grafana
