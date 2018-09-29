@@ -47,16 +47,16 @@ For checking the metrics, open a browser and check below URLs:
 - http://localhost:8771/metrics for vertx-gateway
 
 To send real requests across micro-services, open a browser and check below URLs:
-- http://localhost:9081/provideHat 
-    Request Route: hat-service-provider
-- http://localhost:9091/orderHat
-    Request Route: httpclient-shop -> hat-service-provider
-- http://localhost:8771/http-client-shop/orderHat 
-    Request Route: vertx-gateway -> httpclient-shop -> hat-service-provider
++ http://localhost:9081/provideHat 
+    - Request Route: hat-service-provider
++ http://localhost:9091/orderHat
+    - Request Route: httpclient-shop -> hat-service-provider
++ http://localhost:8771/http-client-shop/orderHat 
+    - Request Route: vertx-gateway -> httpclient-shop -> hat-service-provider
 
 ### Load Test
 
-Please first install "ab - Apache HTTP server benchmarking tool"
+Please first install *ab - Apache HTTP server benchmarking tool*
 
 Then, open a terminal and launch:
 ```
