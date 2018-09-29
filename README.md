@@ -64,13 +64,25 @@ To send real requests across micro-services, open a browser and check below URLs
 
 ### Load Test
 
-Step by step:
-- first, please install *ab - Apache HTTP server benchmarking tool*
-- second, make sure all services are started!
-- third, open a terminal and launch below command (i.e. 10000 total requests with 4 concurrent):
+#### Pre-requisites
+
+1. please install *ab - Apache HTTP server benchmarking tool*
+2. make sure all services are started!
+
+#### WarmUp
+
+Open a terminal and launch below command (i.e. 1000 total requests with 4 concurrent):
 ```
-$ cd <ab_path>/bin
-$ ./ab.exe -n 10000 -c 10 -l http://localhost:8771/http-client-shop/orderHat
+$ cd <ab_http_path>/bin
+$ ./ab.exe -n 1000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
+```
+
+#### Real Measurements
+
+Open a terminal and launch below command (i.e. 5000 total requests with 4 concurrent):
+```
+$ cd <ab_http_path>/bin
+$ ./ab.exe -n 5000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
 ```
 
 ### ToDo
