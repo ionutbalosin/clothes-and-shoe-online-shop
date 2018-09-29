@@ -34,10 +34,10 @@ $ ./bootstrap-service.sh <GROUP_ID> <VERSION> [true||false]
 
 Examples of starting all services with Java Mission Control (JMC) as optional parameter:
 ```
-$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT [true]
-$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT [true]
-$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT [true]
-$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT [true]
+$ ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT [true||false]
+$ ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT [true||false]
+$ ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT [true||false]
+$ ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT [true||false]
 ```
 
 Please make sure the **redis-service-discovery** is started first!

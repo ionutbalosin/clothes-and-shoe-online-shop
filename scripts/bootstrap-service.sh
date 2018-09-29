@@ -3,8 +3,10 @@
 if [[ "$#" -lt 2 ]] ; then
     echo "Usage: ./bootstrap-service GROUP_ID VERSION [useJMC]"
     echo "  Examples:"
-    echo "     ./bootstrap-service hat-service-provider 0.0.1-SNAPSHOT true"
-    echo "     ./bootstrap-service hat-service-provider 0.0.1-SNAPSHOT"
+    echo "     ./bootstrap-service.sh redis-service-discovery 0.0.1-SNAPSHOT [true||false]"
+    echo "     ./bootstrap-service.sh vertx-gateway 0.0.1-SNAPSHOT [true||false]"
+    echo "     ./bootstrap-service.sh hat-service-provider 0.0.1-SNAPSHOT [true||false]"
+    echo "     ./bootstrap-service.sh httpclient-shop 0.0.1-SNAPSHOT [true||false]"
     return
 fi
 
@@ -25,6 +27,5 @@ echo "JMC_ARGS = "$JMC_ARGS
 echo "JAVA_HOME = "$JAVA_HOME
 echo "*************************************"
 
-# Start Vanilla Java
 echo ">>> START $GROUP_ID:$VERSION SERVICE <<<"
 java $JMC_ARGS -jar ../$GROUP_ID/build/libs/$GROUP_ID-$VERSION.jar
