@@ -1,6 +1,0 @@
-{
-  "api.name": "hat-provider",
-  "service.name": "hat-provider",
-  "http.address": "127.0.0.1",
-  "http.port": 9081
-}
