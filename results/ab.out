@@ -28,33 +28,35 @@ Document Path:          /http-client-shop/orderHat
 Document Length:        Variable
 
 Concurrency Level:      4
-Time taken for tests:   9.513 seconds
+Time taken for tests:   10.393 seconds
 Complete requests:      1000
 Failed requests:        0
-Total transferred:      166782 bytes
-HTML transferred:       80782 bytes
-Requests per second:    105.12 [#/sec] (mean)
-Time per request:       38.052 [ms] (mean)
-Time per request:       9.513 [ms] (mean, across all concurrent requests)
-Transfer rate:          17.12 [Kbytes/sec] received
+Total transferred:      154495 bytes
+HTML transferred:       68495 bytes
+Requests per second:    96.21 [#/sec] (mean)
+Time per request:       41.574 [ms] (mean)
+Time per request:       10.393 [ms] (mean, across all concurrent requests)
+Transfer rate:          14.52 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        1    1   1.1      1      27
-Processing:    13   35  17.0     33     380
-Waiting:       13   35  16.9     32     376
-Total:         15   37  17.1     34     382
+Connect:        1    1   0.8      2      14
+Processing:    11   40  24.3     35     312
+Waiting:       11   39  24.2     35     312
+Total:         12   41  24.3     37     313
+WARNING: The median and mean for the initial connection time are not within a normal deviation
+        These results are probably not that reliable.
 
 Percentage of the requests served within a certain time (ms)
-  50%     34
-  66%     40
-  75%     44
-  80%     46
-  90%     55
-  95%     62
-  98%     71
-  99%     80
- 100%    382 (longest request)
+  50%     37
+  66%     42
+  75%     46
+  80%     50
+  90%     62
+  95%     74
+  98%    110
+  99%    166
+ 100%    313 (longest request)
 
 ===========================================================================
 REAL MEASUREMENTS
@@ -86,30 +88,32 @@ Document Path:          /http-client-shop/orderHat
 Document Length:        Variable
 
 Concurrency Level:      4
-Time taken for tests:   27.701 seconds
+Time taken for tests:   30.808 seconds
 Complete requests:      5000
 Failed requests:        0
-Total transferred:      833886 bytes
-HTML transferred:       403886 bytes
-Requests per second:    180.50 [#/sec] (mean)
-Time per request:       22.161 [ms] (mean)
-Time per request:       5.540 [ms] (mean, across all concurrent requests)
-Transfer rate:          29.40 [Kbytes/sec] received
+Total transferred:      772354 bytes
+HTML transferred:       342354 bytes
+Requests per second:    162.30 [#/sec] (mean)
+Time per request:       24.646 [ms] (mean)
+Time per request:       6.162 [ms] (mean, across all concurrent requests)
+Transfer rate:          24.48 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        1    1   1.0      1      35
-Processing:     8   21  14.2     18     293
-Waiting:        8   20  14.1     17     293
-Total:          9   22  14.3     19     294
+Connect:        1    1   0.7      2      25
+Processing:     9   23  18.7     19     478
+Waiting:        7   23  18.6     19     477
+Total:         10   24  18.7     21     480
+WARNING: The median and mean for the initial connection time are not within a normal deviation
+        These results are probably not that reliable.
 
 Percentage of the requests served within a certain time (ms)
-  50%     19
-  66%     22
-  75%     25
-  80%     27
-  90%     33
-  95%     42
-  98%     57
-  99%     71
- 100%    294 (longest request)
+  50%     21
+  66%     24
+  75%     27
+  80%     29
+  90%     35
+  95%     44
+  98%     70
+  99%     90
+ 100%    480 (longest request)

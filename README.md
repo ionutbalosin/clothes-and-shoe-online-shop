@@ -66,7 +66,7 @@ To send real requests across micro-services, open a browser and check below URLs
 
 #### Pre-requisites
 
-1. please install *ab - Apache HTTP server benchmarking tool*
+1. please install **ab - Apache HTTP server benchmarking tool**
 2. make sure all services are started!
 
 #### WarmUp

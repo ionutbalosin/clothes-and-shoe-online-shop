@@ -1,4 +1,5 @@
-2018-09-29 12:03:12 [main] INFO  ConfigRetrieverHelper:30 - Successfully retrieved configuration
-2018-09-29 12:03:13 [vert.x-eventloop-thread-2] INFO  VertxGatewayApiVerticle:52 - org.ib.vertx.vertxgateway.VertxGatewayApiVerticle started on port 8771
-2018-09-29 12:03:13 [vert.x-eventloop-thread-2] INFO  VertxGatewayApiVerticle:53 - JVM running for 5.117 sec
-2018-09-29 12:03:13 [vert.x-eventloop-thread-2] INFO  RestApiHelperVerticle:82 - Service [vertx-gateway] successfully published
+2018-09-30 10:17:21 [main] INFO  VertxGatewayApplication:19 - Java Version [10.0.2]
+2018-09-30 10:17:22 [main] INFO  ConfigRetrieverHelper:30 - Successfully retrieved configuration
+2018-09-30 10:17:23 [vert.x-eventloop-thread-2] INFO  VertxGatewayApiVerticle:52 - org.ib.vertx.vertxgateway.VertxGatewayApiVerticle started on port 8771
+2018-09-30 10:17:23 [vert.x-eventloop-thread-2] INFO  VertxGatewayApiVerticle:53 - JVM running for 6.569 sec
+2018-09-30 10:17:23 [vert.x-eventloop-thread-2] INFO  RestApiHelperVerticle:80 - Service [vertx-gateway] successfully published

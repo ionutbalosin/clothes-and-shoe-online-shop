@@ -1,2 +1,3 @@
-2018-09-29 12:03:05 [main] INFO  RedisBackendService:21 - Embedded Redis server started on port 8761
-2018-09-29 12:03:05 [main] INFO  RedisBackendService:22 - JVM running for 3.667 sec
+2018-09-30 10:17:06 [main] INFO  RedisBackendService:14 - Java Version [10.0.2]
+2018-09-30 10:17:07 [main] INFO  RedisBackendService:22 - Embedded Redis server started on port 8761
+2018-09-30 10:17:07 [main] INFO  RedisBackendService:23 - JVM running for 4.683 sec
