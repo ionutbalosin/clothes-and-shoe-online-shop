@@ -71,10 +71,10 @@ To send real requests across micro-services, open a browser and check below URLs
 
 #### WarmUp
 
-Open a shell terminal and launch below command (i.e. 1000 total requests / 4 concurrent):
+Open a shell terminal and launch below command (i.e. 2000 total requests / 4 concurrent):
 ```
 $ cd <ab_http_path>/bin
-$ ./ab.exe -n 1000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
+$ ./ab.exe -n 2000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
 ```
 
 #### Real Measurements
