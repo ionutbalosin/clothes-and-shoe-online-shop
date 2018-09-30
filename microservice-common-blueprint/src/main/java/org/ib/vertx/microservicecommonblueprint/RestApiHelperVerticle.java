@@ -1,6 +1,5 @@
 package org.ib.vertx.microservicecommonblueprint;
 
-import com.netflix.hystrix.HystrixCommand;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;
@@ -208,22 +207,6 @@ public class RestApiHelperVerticle {
         } else {
             toReq.end(context.getBody());
         }
-    }
-
-    public void dispatchRequests2(RoutingContext routingContext, String requestURI){
-        verticle.getVertx().runOnContext(v -> {
-            HystrixCommand<String> command = new RestApiHystrixCommand(verticle.getVertx(), 8080, "localhost", requestURI);
-            verticle.getVertx().<String>executeBlocking(
-                    future -> future.complete(command.execute()),
-                    ar -> {
-                        // back on the event loop
-                        String result = ar.result();
-                        logger.debug(result);
-                        routingContext.response().putHeader("content-type", "application/json; charset=utf-8")
-                            .end(result);
-                    }
-            );
-        });
     }
 
     private Future<List<Record>> getAllEndpoints() {
