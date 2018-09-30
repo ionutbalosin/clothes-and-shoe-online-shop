@@ -1,5 +1,5 @@
-2018-09-30 10:17:36 [main] INFO  HttpClientApplication:19 - Java Version [10.0.2]
-2018-09-30 10:17:37 [main] INFO  ConfigRetrieverHelper:30 - Successfully retrieved configuration
-2018-09-30 10:17:38 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:58 - org.ib.vertx.httpclientshop.HttpClientApiVerticle started on port 9091
-2018-09-30 10:17:38 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:59 - JVM running for 6.887 sec
-2018-09-30 10:17:38 [vert.x-eventloop-thread-2] INFO  RestApiHelperVerticle:80 - Service [http-client-shop] successfully published
+2018-09-30 10:44:59 [main] INFO  HttpClientApplication:19 - Java Version [10.0.2]
+2018-09-30 10:45:00 [main] INFO  ConfigRetrieverHelper:30 - Successfully retrieved configuration
+2018-09-30 10:45:01 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:58 - org.ib.vertx.httpclientshop.HttpClientApiVerticle started on port 9091
+2018-09-30 10:45:01 [vert.x-eventloop-thread-2] INFO  HttpClientApiVerticle:59 - JVM running for 2.518 sec
+2018-09-30 10:45:01 [vert.x-eventloop-thread-2] INFO  RestApiHelperVerticle:80 - Service [http-client-shop] successfully published

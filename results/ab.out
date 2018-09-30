@@ -1,23 +1,22 @@
 ===========================================================================
 WARM-UP
-$ /c/Program_dev/Apache24/bin
-$ ./ab.exe -n 1000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
+$ ./ab.exe -n 2000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
 This is ApacheBench, Version 2.3 <$Revision: 1826891 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
 Licensed to The Apache Software Foundation, http://www.apache.org/
 
 Benchmarking localhost (be patient)
-Completed 100 requests
 Completed 200 requests
-Completed 300 requests
 Completed 400 requests
-Completed 500 requests
 Completed 600 requests
-Completed 700 requests
 Completed 800 requests
-Completed 900 requests
 Completed 1000 requests
-Finished 1000 requests
+Completed 1200 requests
+Completed 1400 requests
+Completed 1600 requests
+Completed 1800 requests
+Completed 2000 requests
+Finished 2000 requests
 
 
 Server Software:
@@ -28,39 +27,36 @@ Document Path:          /http-client-shop/orderHat
 Document Length:        Variable
 
 Concurrency Level:      4
-Time taken for tests:   10.393 seconds
-Complete requests:      1000
+Time taken for tests:   17.812 seconds
+Complete requests:      2000
 Failed requests:        0
-Total transferred:      154495 bytes
-HTML transferred:       68495 bytes
-Requests per second:    96.21 [#/sec] (mean)
-Time per request:       41.574 [ms] (mean)
-Time per request:       10.393 [ms] (mean, across all concurrent requests)
-Transfer rate:          14.52 [Kbytes/sec] received
+Total transferred:      308970 bytes
+HTML transferred:       136970 bytes
+Requests per second:    112.28 [#/sec] (mean)
+Time per request:       35.624 [ms] (mean)
+Time per request:       8.906 [ms] (mean, across all concurrent requests)
+Transfer rate:          16.94 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        1    1   0.8      2      14
-Processing:    11   40  24.3     35     312
-Waiting:       11   39  24.2     35     312
-Total:         12   41  24.3     37     313
-WARNING: The median and mean for the initial connection time are not within a normal deviation
-        These results are probably not that reliable.
+Connect:        1    2   1.2      2      32
+Processing:    11   34  18.7     29     175
+Waiting:       11   34  18.6     29     175
+Total:         13   35  18.7     31     177
 
 Percentage of the requests served within a certain time (ms)
-  50%     37
-  66%     42
-  75%     46
-  80%     50
-  90%     62
-  95%     74
-  98%    110
-  99%    166
- 100%    313 (longest request)
+  50%     31
+  66%     36
+  75%     42
+  80%     45
+  90%     57
+  95%     71
+  98%     87
+  99%    106
+ 100%    177 (longest request)
 
 ===========================================================================
-REAL MEASUREMENTS
-$ /c/Program_dev/Apache24/bin
+REALTIME MEASUREMENTS
 $ ./ab.exe -n 5000 -c 4 -l http://localhost:8771/http-client-shop/orderHat
 This is ApacheBench, Version 2.3 <$Revision: 1826891 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -88,32 +84,32 @@ Document Path:          /http-client-shop/orderHat
 Document Length:        Variable
 
 Concurrency Level:      4
-Time taken for tests:   30.808 seconds
+Time taken for tests:   26.164 seconds
 Complete requests:      5000
 Failed requests:        0
-Total transferred:      772354 bytes
-HTML transferred:       342354 bytes
-Requests per second:    162.30 [#/sec] (mean)
-Time per request:       24.646 [ms] (mean)
-Time per request:       6.162 [ms] (mean, across all concurrent requests)
-Transfer rate:          24.48 [Kbytes/sec] received
+Total transferred:      772393 bytes
+HTML transferred:       342393 bytes
+Requests per second:    191.10 [#/sec] (mean)
+Time per request:       20.931 [ms] (mean)
+Time per request:       5.233 [ms] (mean, across all concurrent requests)
+Transfer rate:          28.83 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        1    1   0.7      2      25
-Processing:     9   23  18.7     19     478
-Waiting:        7   23  18.6     19     477
-Total:         10   24  18.7     21     480
+Connect:        1    1   0.6      2      25
+Processing:     9   19  13.9     16     186
+Waiting:        8   19  13.7     16     186
+Total:         10   21  13.9     17     187
 WARNING: The median and mean for the initial connection time are not within a normal deviation
         These results are probably not that reliable.
 
 Percentage of the requests served within a certain time (ms)
-  50%     21
-  66%     24
-  75%     27
-  80%     29
-  90%     35
-  95%     44
-  98%     70
+  50%     17
+  66%     20
+  75%     22
+  80%     24
+  90%     30
+  95%     39
+  98%     64
   99%     90
- 100%    480 (longest request)
+ 100%    187 (longest request)
